@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { OrgProvider } from "@/context/org-context";
@@ -7,7 +7,15 @@ import { SubscriptionProvider } from "@/context/subscription-context";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const outfit = Outfit({ subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-body",
+});
 
 export const metadata: Metadata = {
   title: "LogiMatch AI",
@@ -25,7 +33,7 @@ export default function RootLayout({
         <SubscriptionProvider>
           <html lang="en" suppressHydrationWarning>
             <body
-              className={`${outfit.className} antialiased`}
+              className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}
             >
               <ThemeProvider
                 attribute="class"

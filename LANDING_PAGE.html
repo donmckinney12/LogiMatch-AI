@@ -1,30 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LogiMatch AI - Freight Procurement Intelligence Platform</title>
-    <meta name="description" content="Automate freight quote analysis and reduce procurement costs by 75%. AI-powered platform for enterprise logistics.">
+    <meta name="description"
+        content="Automate freight quote analysis and reduce procurement costs by 75%. AI-powered platform for enterprise logistics.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #1a1a1a;
             background: #ffffff;
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
         }
-        
+
         /* Header */
         header {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
@@ -32,100 +57,111 @@
             padding: 100px 0;
             text-align: center;
         }
-        
+
         header h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
+            font-size: 3.75rem;
+            font-weight: 700;
             margin-bottom: 24px;
-            line-height: 1.2;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
         }
-        
+
         header p {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             margin-bottom: 40px;
             opacity: 0.95;
+            font-weight: 400;
+            line-height: 1.6;
         }
-        
+
         .cta-buttons {
             display: flex;
             gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
         }
-        
+
         .btn {
             padding: 16px 32px;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            border-radius: 8px;
+            border-radius: 10px;
             text-decoration: none;
             transition: all 0.3s;
             cursor: pointer;
             border: none;
+            letter-spacing: -0.01em;
+            font-family: 'Inter', sans-serif;
         }
-        
+
         .btn-primary {
             background: white;
             color: #1e3a8a;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
         }
-        
+
         .btn-secondary {
             background: transparent;
             color: white;
             border: 2px solid white;
         }
-        
+
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
         }
-        
+
         /* Stats Section */
         .stats {
             background: #f8fafc;
             padding: 80px 0;
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 40px;
             text-align: center;
         }
-        
+
         .stat-card h3 {
-            font-size: 3rem;
+            font-size: 3.5rem;
+            font-weight: 700;
             color: #1e3a8a;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
         }
-        
+
         .stat-card p {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             color: #64748b;
+            font-weight: 500;
+            letter-spacing: -0.01em;
         }
-        
+
         /* Features Section */
         .features {
             padding: 100px 0;
         }
-        
+
         .section-title {
             text-align: center;
-            font-size: 2.5rem;
+            font-size: 2.75rem;
+            font-weight: 700;
             margin-bottom: 60px;
             color: #1a1a1a;
+            letter-spacing: -0.03em;
         }
-        
+
         .features-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 40px;
         }
-        
+
         .feature-card {
             padding: 32px;
             border-radius: 12px;
@@ -133,29 +169,33 @@
             border: 1px solid #e2e8f0;
             transition: all 0.3s;
         }
-        
+
         .feature-card:hover {
-            box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
             transform: translateY(-4px);
         }
-        
+
         .feature-card h3 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 600;
             margin-bottom: 16px;
             color: #1e3a8a;
+            letter-spacing: -0.02em;
         }
-        
+
         .feature-card ul {
             list-style: none;
             padding: 0;
         }
-        
+
         .feature-card li {
             padding: 8px 0;
             padding-left: 24px;
             position: relative;
+            font-size: 0.95rem;
+            line-height: 1.7;
         }
-        
+
         .feature-card li:before {
             content: "✓";
             position: absolute;
@@ -163,52 +203,52 @@
             color: #10b981;
             font-weight: bold;
         }
-        
+
         /* ROI Calculator */
         .roi-section {
             background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             color: white;
             padding: 100px 0;
         }
-        
+
         .roi-calculator {
-            background: rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             padding: 48px;
             border-radius: 16px;
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .roi-table {
             width: 100%;
             margin-top: 32px;
             border-collapse: collapse;
         }
-        
+
         .roi-table th,
         .roi-table td {
             padding: 16px;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .roi-table th {
             font-weight: 600;
         }
-        
+
         .roi-total {
             font-size: 1.5rem;
             font-weight: 800;
             color: #fbbf24;
         }
-        
+
         /* Pricing */
         .pricing {
             padding: 100px 0;
             background: #f8fafc;
         }
-        
+
         .pricing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -216,7 +256,7 @@
             max-width: 1000px;
             margin: 0 auto;
         }
-        
+
         .pricing-card {
             background: white;
             padding: 40px;
@@ -224,38 +264,43 @@
             border: 2px solid #e2e8f0;
             text-align: center;
         }
-        
+
         .pricing-card.featured {
             border-color: #3b82f6;
             transform: scale(1.05);
             box-shadow: 0 12px 32px rgba(59, 130, 246, 0.2);
         }
-        
+
         .pricing-card h3 {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
+            font-weight: 600;
             margin-bottom: 16px;
+            letter-spacing: -0.02em;
         }
-        
+
         .price {
-            font-size: 3rem;
-            font-weight: 800;
+            font-size: 3.5rem;
+            font-weight: 700;
             color: #1e3a8a;
             margin: 24px 0;
+            letter-spacing: -0.03em;
         }
-        
+
         .pricing-card ul {
             list-style: none;
             padding: 0;
             margin: 32px 0;
             text-align: left;
         }
-        
+
         .pricing-card li {
             padding: 12px 0;
             padding-left: 28px;
             position: relative;
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
-        
+
         .pricing-card li:before {
             content: "✓";
             position: absolute;
@@ -263,7 +308,7 @@
             color: #10b981;
             font-weight: bold;
         }
-        
+
         /* CTA Section */
         .final-cta {
             background: #1a1a1a;
@@ -271,18 +316,21 @@
             padding: 100px 0;
             text-align: center;
         }
-        
+
         .final-cta h2 {
-            font-size: 2.5rem;
+            font-size: 2.75rem;
+            font-weight: 700;
             margin-bottom: 24px;
+            letter-spacing: -0.03em;
         }
-        
+
         .final-cta p {
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin-bottom: 40px;
             opacity: 0.9;
+            font-weight: 400;
         }
-        
+
         /* Footer */
         footer {
             background: #0f172a;
@@ -290,13 +338,14 @@
             padding: 40px 0;
             text-align: center;
         }
-        
+
         footer a {
             color: #3b82f6;
             text-decoration: none;
         }
     </style>
 </head>
+
 <body>
     <!-- Hero Section -->
     <header>
@@ -348,7 +397,7 @@
                         <li>Real-time invoice discrepancy alerts</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card">
                     <h3>AI-Powered Procurement</h3>
                     <ul>
@@ -359,7 +408,7 @@
                         <li>95%+ PDF data extraction accuracy</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card">
                     <h3>Global Risk Monitoring</h3>
                     <ul>
@@ -369,7 +418,7 @@
                         <li>Geopolitical risk alerts</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card">
                     <h3>Carrier Management</h3>
                     <ul>
@@ -380,7 +429,7 @@
                         <li>Contract expiration alerts</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card">
                     <h3>Security & Compliance</h3>
                     <ul>
@@ -391,7 +440,7 @@
                         <li>SOC 2 Type II certified</li>
                     </ul>
                 </div>
-                
+
                 <div class="feature-card">
                     <h3>Integrations</h3>
                     <ul>
@@ -411,8 +460,9 @@
         <div class="container">
             <h2 class="section-title">ROI Calculator</h2>
             <div class="roi-calculator">
-                <p style="font-size: 1.2rem; margin-bottom: 24px;">Example: Mid-size freight forwarder (500 shipments/month)</p>
-                
+                <p style="font-size: 1.2rem; margin-bottom: 24px;">Example: Mid-size freight forwarder (500
+                    shipments/month)</p>
+
                 <table class="roi-table">
                     <thead>
                         <tr>
@@ -447,9 +497,10 @@
                         </tr>
                     </tbody>
                 </table>
-                
+
                 <p style="margin-top: 24px; font-size: 0.9rem; opacity: 0.8;">
-                    *Assumptions: $50/hr labor cost, 3% avg invoice variance, 8% cost difference optimal vs. suboptimal carrier
+                    *Assumptions: $50/hr labor cost, 3% avg invoice variance, 8% cost difference optimal vs. suboptimal
+                    carrier
                 </p>
             </div>
         </div>
@@ -472,7 +523,7 @@
                     </ul>
                     <a href="#demo" class="btn btn-primary">Start Free Trial</a>
                 </div>
-                
+
                 <div class="pricing-card featured">
                     <h3>Professional</h3>
                     <div class="price">$1,499<span style="font-size: 1rem;">/mo</span></div>
@@ -486,7 +537,7 @@
                     </ul>
                     <a href="#demo" class="btn btn-primary">Schedule Demo</a>
                 </div>
-                
+
                 <div class="pricing-card">
                     <h3>Enterprise</h3>
                     <div class="price">Custom</div>
@@ -511,7 +562,8 @@
             <p>Schedule a 30-minute demo and see LogiMatch AI analyze real freight quotes</p>
             <div class="cta-buttons">
                 <a href="mailto:sales@logimatch.ai" class="btn btn-primary">Schedule Demo</a>
-                <a href="mailto:sales@logimatch.ai?subject=Free Trial Request" class="btn btn-secondary">Start Free Trial</a>
+                <a href="mailto:sales@logimatch.ai?subject=Free Trial Request" class="btn btn-secondary">Start Free
+                    Trial</a>
             </div>
         </div>
     </section>
@@ -521,11 +573,12 @@
         <div class="container">
             <p>&copy; 2026 Antigravity AI Inc. All Rights Reserved.</p>
             <p style="margin-top: 16px;">
-                <a href="#">Terms of Service</a> | 
-                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a> |
+                <a href="#">Privacy Policy</a> |
                 <a href="#">Documentation</a>
             </p>
         </div>
     </footer>
 </body>
+
 </html>
