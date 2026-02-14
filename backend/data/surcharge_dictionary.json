@@ -1,0 +1,58 @@
+{
+    "BAF": {
+        "standard_name": "Bunker Adjustment Factor",
+        "category": "Fuel"
+    },
+    "GRI": {
+        "standard_name": "General Rate Increase",
+        "category": "Base Rate"
+    },
+    "PSS": {
+        "standard_name": "Peak Season Surcharge",
+        "category": "Seasonal"
+    },
+    "LSS": {
+        "standard_name": "Low Sulfur Surcharge",
+        "category": "Fuel"
+    },
+    "THC": {
+        "standard_name": "Terminal Handling Charge",
+        "category": "Handling"
+    },
+    "DTHC": {
+        "standard_name": "Destination Terminal Handling Charge",
+        "category": "Handling"
+    },
+    "OTHC": {
+        "standard_name": "Origin Terminal Handling Charge",
+        "category": "Handling"
+    },
+    "ISPS": {
+        "standard_name": "International Ship and Port Facility Security",
+        "category": "Security"
+    },
+    "AMS": {
+        "standard_name": "Automated Manifest System Fee",
+        "category": "Documentation"
+    },
+    "CAF": {
+        "standard_name": "Currency Adjustment Factor",
+        "category": "Currency"
+    },
+    "DOC": {
+        "standard_name": "Documentation Fee",
+        "category": "Documentation"
+    },
+    "WRS": {
+        "standard_name": "War Risk Surcharge",
+        "category": "Security"
+    },
+    "EIS": {
+        "standard_name": "Equipment Imbalance Surcharge",
+        "category": "Equipment"
+    },
+    "DDC": {
+        "standard_name": "Destination Delivery Charge",
+        "category": "Logistics"
+    }
+}

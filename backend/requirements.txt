@@ -1,0 +1,13 @@
+flask
+flask-cors
+pymupdf
+langchain
+langchain-community
+langchain-openai
+openai
+python-dotenv
+tiktoken
+flask-sqlalchemy
+flask-migrate
+sendgrid
+pdfplumber
