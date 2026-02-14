@@ -12,8 +12,6 @@ services:
       - key: OPENAI_API_KEY
         sync: false
       - key: DATABASE_URL
-        sync: false
-      - key: SENDGRID_API_KEY
-        sync: false
+        value: sqlite:///logimatch_v4.db
       - key: FLASK_ENV
         value: production

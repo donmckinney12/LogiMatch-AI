@@ -17,7 +17,6 @@
    ```
    OPENAI_API_KEY=<your-openai-api-key>
    DATABASE_URL=sqlite:///logimatch_v4.db
-   SENDGRID_API_KEY=<your-sendgrid-api-key>
    FLASK_ENV=production
    ```
 
