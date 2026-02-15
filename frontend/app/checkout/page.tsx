@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { AppLayout } from '@/components/app-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -11,7 +11,7 @@ import { CreditCard, Lock, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { toast } from 'sonner'
 
-export default function CheckoutPage() {
+function CheckoutContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
     const { user } = useUser()
@@ -219,5 +219,19 @@ export default function CheckoutPage() {
                 </div>
             </div>
         </AppLayout>
+    )
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <AppLayout>
+                <div className="flex items-center justify-center h-64">
+                    <Loader2 className="animate-spin text-primary" size={32} />
+                </div>
+            </AppLayout>
+        }>
+            <CheckoutContent />
+        </Suspense>
     )
 }
