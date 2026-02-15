@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
@@ -34,6 +34,11 @@ export function TopNavbar() {
     const pathname = usePathname()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     return (
         <>
@@ -99,14 +104,16 @@ export function TopNavbar() {
 
                             {/* User Button */}
                             <div className="flex items-center">
-                                <UserButton
-                                    afterSignOutUrl="/"
-                                    appearance={{
-                                        elements: {
-                                            avatarBox: "h-8 w-8"
-                                        }
-                                    }}
-                                />
+                                {mounted && (
+                                    <UserButton
+                                        afterSignOutUrl="/"
+                                        appearance={{
+                                            elements: {
+                                                avatarBox: "h-8 w-8"
+                                            }
+                                        }}
+                                    />
+                                )}
                             </div>
 
                             {/* Mobile Menu Button */}
