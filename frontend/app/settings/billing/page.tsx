@@ -28,20 +28,14 @@ export default function BillingPage() {
         }
     }
 
-    const switchTier = async (tier: string) => {
-        setLoading(true)
-        try {
-            await fetch('http://localhost:5000/api/billing/tier', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ user_id: 'PilotUser_01', tier })
-            })
-            await fetchUsage()
-        } catch (e) {
-            console.error(e)
-        } finally {
-            setLoading(false)
-        }
+    const goToCheckout = (tier: string, price: number) => {
+        // Redirect to checkout page with tier and price info
+        const params = new URLSearchParams({
+            tier,
+            price: price.toString(),
+            interval
+        })
+        window.location.href = `/checkout?${params.toString()}`
     }
 
     if (loading && !usage) return <div className="p-8">Loading billing data...</div>
@@ -195,10 +189,10 @@ export default function BillingPage() {
                             <CardFooter>
                                 <button
                                     disabled={usage?.subscription_tier === 'BASE'}
-                                    onClick={() => switchTier('BASE')}
+                                    onClick={() => goToCheckout('BASE', interval === 'month' ? 99 : 79)}
                                     className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-primary/20"
                                 >
-                                    {usage?.subscription_tier === 'BASE' ? 'Current Plan' : 'Downgrade to Base'}
+                                    {usage?.subscription_tier === 'BASE' ? 'Current Plan' : 'Select Base Plan'}
                                 </button>
                             </CardFooter>
                         </Card>
@@ -229,10 +223,10 @@ export default function BillingPage() {
                             <CardFooter>
                                 <button
                                     disabled={usage?.subscription_tier === 'PRO'}
-                                    onClick={() => switchTier('PRO')}
+                                    onClick={() => goToCheckout('PRO', interval === 'month' ? 499 : 399)}
                                     className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-primary/20"
                                 >
-                                    {usage?.subscription_tier === 'PRO' ? 'Current Plan' : 'Upgrade to Pro'}
+                                    {usage?.subscription_tier === 'PRO' ? 'Current Plan' : 'Select Pro Plan'}
                                 </button>
                             </CardFooter>
                         </Card>
@@ -266,10 +260,10 @@ export default function BillingPage() {
                             <CardFooter>
                                 <button
                                     disabled={usage?.subscription_tier === 'ELITE'}
-                                    onClick={() => switchTier('ELITE')}
+                                    onClick={() => window.location.href = '/contact?plan=elite'}
                                     className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-indigo-600/20"
                                 >
-                                    {usage?.subscription_tier === 'ELITE' ? 'Current Plan' : 'Talk to Sales'}
+                                    {usage?.subscription_tier === 'ELITE' ? 'Current Plan' : 'Contact Sales'}
                                 </button>
                             </CardFooter>
                         </Card>
