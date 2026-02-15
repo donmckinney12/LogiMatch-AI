@@ -5,18 +5,19 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { UserButton } from '@clerk/nextjs'
 import {
-    Search,
-    Bell,
     Menu,
     X,
     LayoutDashboard,
     FileText,
     BarChart3,
     Settings,
-    Scale
+    Scale,
+    Search
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
+import { SearchModal } from '@/components/search-modal'
+import { NotificationsPanel } from '@/components/notifications-panel'
 
 const navigation = [
     { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -78,27 +79,15 @@ export function TopNavbar() {
                             </div>
                         </div>
 
-                        {/* Center: Search Bar */}
+                        {/* Center: Search Modal */}
                         <div className="hidden lg:flex flex-1 max-w-md mx-8">
-                            <div className="relative w-full">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                                <Input
-                                    type="text"
-                                    placeholder="Search quotes, carriers, analytics..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10 bg-muted/50 border-border/50 focus:bg-background"
-                                />
-                            </div>
+                            <SearchModal />
                         </div>
 
                         {/* Right: Notifications + User Menu */}
                         <div className="flex items-center gap-3">
-                            {/* Notifications */}
-                            <button className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                                <Bell size={20} />
-                                <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary ring-2 ring-background"></span>
-                            </button>
+                            {/* Notifications Panel */}
+                            <NotificationsPanel />
 
                             {/* Settings (Desktop) */}
                             <Link
