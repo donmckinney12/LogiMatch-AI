@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Source_Sans_3, Inter } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { OrgProvider } from "@/context/org-context";
@@ -7,7 +7,7 @@ import { SubscriptionProvider } from "@/context/subscription-context";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const spaceGrotesk = Space_Grotesk({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
   variable: "--font-heading",
 });
@@ -33,7 +33,7 @@ export default function RootLayout({
         <SubscriptionProvider>
           <html lang="en" suppressHydrationWarning>
             <body
-              className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}
+              className={`${inter.variable} ${sourceSans.variable} font-body antialiased`}
             >
               <ThemeProvider
                 attribute="class"
