@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useUser } from "@clerk/nextjs"
+import { useTheme } from "next-themes"
 import { AppLayout } from "@/components/app-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +23,7 @@ import { cn } from "@/lib/utils"
 
 export default function ProfilePage() {
     const { user, isLoaded } = useUser()
+    const { theme, setTheme } = useTheme()
     const [isSaving, setIsSaving] = useState(false)
     const [preferences, setPreferences] = useState({
         marketingEmails: true,
@@ -175,12 +177,21 @@ export default function ProfilePage() {
 
                                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl border border-border/50">
                                     <div className="space-y-0.5">
-                                        <div className="font-bold text-sm">Dark Mode (Neural View)</div>
-                                        <div className="text-xs text-muted-foreground">Optimize the interface for low-light trade floors.</div>
+                                        <div className="font-bold text-sm">Dark Mode</div>
+                                        <div className="text-xs text-muted-foreground">Optimize the interface for low-light environments.</div>
                                     </div>
-                                    <div className="p-2 bg-card rounded-lg text-primary">
-                                        <Moon size={18} />
-                                    </div>
+                                    <button
+                                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                        className={cn(
+                                            "w-12 h-6 rounded-full transition-colors relative",
+                                            theme === 'dark' ? "bg-primary" : "bg-muted-foreground/30"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                                            theme === 'dark' ? "right-1" : "left-1"
+                                        )} />
+                                    </button>
                                 </div>
                             </div>
 
