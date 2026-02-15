@@ -112,7 +112,7 @@ export default function AnalysisPage() {
                                         <Tooltip
                                             contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }}
                                             labelStyle={{ color: 'var(--foreground)' }}
-                                            formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spend']}
+                                            formatter={(value: number | undefined) => [`$${(value || 0).toLocaleString()}`, 'Spend']}
                                         />
                                         <Bar dataKey="value" fill="var(--primary)" radius={[4, 4, 0, 0]} />
                                     </BarChart>
@@ -140,7 +140,7 @@ export default function AnalysisPage() {
                                         </Pie>
                                         <Tooltip
                                             contentStyle={{ backgroundColor: 'var(--card)', border: '1px solid var(--border)', borderRadius: '12px' }}
-                                            formatter={(value: number) => [`$${value.toLocaleString()}`, 'Spend']}
+                                            formatter={(value: number | undefined) => [`$${(value || 0).toLocaleString()}`, 'Spend']}
                                         />
                                         <Legend />
                                     </PieChart>
