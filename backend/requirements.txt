@@ -12,4 +12,5 @@ flask-migrate
 sendgrid
 pdfplumber
 gunicorn
+stripe
 reportlab

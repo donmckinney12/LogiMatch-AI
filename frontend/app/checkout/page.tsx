@@ -21,56 +21,38 @@ function CheckoutContent() {
     const interval = searchParams.get('interval') || 'month'
 
     const [isProcessing, setIsProcessing] = useState(false)
-    const [cardNumber, setCardNumber] = useState('')
-    const [expiry, setExpiry] = useState('')
-    const [cvc, setCvc] = useState('')
-    const [name, setName] = useState('')
-
-    useEffect(() => {
-        if (user?.fullName) {
-            setName(user.fullName)
-        }
-    }, [user])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsProcessing(true)
 
-        // Simulate payment processing
-        await new Promise(resolve => setTimeout(resolve, 2000))
+        try {
+            const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
+            const response = await fetch(`${apiBaseUrl}/api/create-checkout-session`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    tier,
+                    price,
+                    interval,
+                }),
+            })
 
-        // In production, this would call Stripe API
-        toast.success(`Successfully subscribed to ${tier} plan!`)
+            const data = await response.json()
 
-        // Redirect to billing page
-        setTimeout(() => {
-            router.push('/settings/billing')
-        }, 1500)
-    }
-
-    const formatCardNumber = (value: string) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-        const matches = v.match(/\d{4,16}/g)
-        const match = (matches && matches[0]) || ''
-        const parts = []
-
-        for (let i = 0, len = match.length; i < len; i += 4) {
-            parts.push(match.substring(i, i + 4))
+            if (data.url) {
+                // Redirect to Stripe Checkout
+                window.location.href = data.url
+            } else {
+                throw new Error(data.error || 'Failed to create checkout session')
+            }
+        } catch (error: any) {
+            console.error('Checkout error:', error)
+            toast.error(error.message || 'Payment service is currently unavailable')
+            setIsProcessing(false)
         }
-
-        if (parts.length) {
-            return parts.join(' ')
-        } else {
-            return value
-        }
-    }
-
-    const formatExpiry = (value: string) => {
-        const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-        if (v.length >= 2) {
-            return v.slice(0, 2) + '/' + v.slice(2, 4)
-        }
-        return v
     }
 
     return (
@@ -130,89 +112,57 @@ function CheckoutContent() {
                         </Card>
                     </div>
 
-                    {/* Payment Form */}
+                    {/* Payment Confirmation */}
                     <div className="md:col-span-2">
                         <Card className="border-border bg-card glass-card">
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-3">
                                     <div className="p-2 bg-primary/10 rounded-xl text-primary">
-                                        <CreditCard size={20} />
+                                        <Lock size={20} />
                                     </div>
-                                    Payment Information
+                                    Secure Payment
                                 </CardTitle>
-                                <CardDescription>Enter your payment details to complete your subscription</CardDescription>
+                                <CardDescription>
+                                    You will be redirected to Stripe to securely complete your payment.
+                                </CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <form onSubmit={handleSubmit} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <Label>Cardholder Name</Label>
-                                        <Input
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                            placeholder="John Doe"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label>Card Number</Label>
-                                        <Input
-                                            value={cardNumber}
-                                            onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                                            placeholder="4242 4242 4242 4242"
-                                            maxLength={19}
-                                            required
-                                        />
-                                        <p className="text-xs text-muted-foreground">Use test card: 4242 4242 4242 4242</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label>Expiry Date</Label>
-                                            <Input
-                                                value={expiry}
-                                                onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                                                placeholder="MM/YY"
-                                                maxLength={5}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label>CVC</Label>
-                                            <Input
-                                                value={cvc}
-                                                onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 3))}
-                                                placeholder="123"
-                                                maxLength={3}
-                                                required
-                                            />
+                                <div className="space-y-6">
+                                    <div className="p-4 rounded-xl bg-muted/50 border border-border">
+                                        <div className="flex items-start gap-3">
+                                            <CheckCircle className="text-primary mt-1" size={18} />
+                                            <div className="space-y-1">
+                                                <p className="text-sm font-bold text-foreground">Secure & Encrypted</p>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Your payment details are never stored on our servers. LogiMatch AI uses Stripe for industry-leading security and compliance.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="pt-6 space-y-4">
+                                    <form onSubmit={handleSubmit} className="pt-2">
                                         <Button
                                             type="submit"
                                             disabled={isProcessing}
-                                            className="w-full h-12 text-sm font-black uppercase tracking-widest"
+                                            className="w-full h-14 text-base font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
                                         >
                                             {isProcessing ? (
                                                 <>
-                                                    <Loader2 className="animate-spin mr-2" size={16} />
-                                                    Processing...
+                                                    <Loader2 className="animate-spin mr-2" size={20} />
+                                                    Redirecting to Stripe...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <CheckCircle className="mr-2" size={16} />
-                                                    Complete Payment - ${price.toFixed(2)}
+                                                    <CreditCard className="mr-2" size={20} />
+                                                    Proceed to Secure Payment — ${price.toFixed(2)}
                                                 </>
                                             )}
                                         </Button>
-
-                                        <p className="text-xs text-center text-muted-foreground">
-                                            By confirming your subscription, you agree to our Terms of Service and Privacy Policy.
+                                        <p className="mt-4 text-[10px] text-center text-muted-foreground/60 uppercase tracking-widest font-bold">
+                                            Trusted by 500+ global logistics companies
                                         </p>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </CardContent>
                         </Card>
                     </div>

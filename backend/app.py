@@ -21,6 +21,11 @@ from services.claims_service import analyze_damage_photo, file_claim
 from services.messaging_service import create_thread, send_message, get_threads, get_messages, generate_ai_quick_replies
 from datetime import datetime
 from flask import send_file
+import stripe
+
+# Stripe Configuration
+stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://www.logimatch.online')
 
 # ... imports ...
 
@@ -79,6 +84,64 @@ def get_audit_logs():
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy", "service": "LogiMatch AI Backend"}), 200
+
+# --- Stripe Checkout Endpoints ---
+@app.route('/api/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        data = request.json
+        tier = data.get('tier')
+        price = data.get('price')
+        interval = data.get('interval', 'month')
+        
+        # Mapping tiers to Stripe Price IDs (Placeholders - user needs to update these)
+        # These should eventually be stored in environment variables or a database
+        PRICE_MAP = {
+            'BASE': {
+                'month': os.getenv('STRIPE_PRICE_BASE_MONTHLY', 'price_base_placeholder'),
+                'year': os.getenv('STRIPE_PRICE_BASE_YEARLY', 'price_base_year_placeholder')
+            },
+            'PRO': {
+                'month': os.getenv('STRIPE_PRICE_PRO_MONTHLY', 'price_pro_placeholder'),
+                'year': os.getenv('STRIPE_PRICE_PRO_YEARLY', 'price_pro_year_placeholder')
+            }
+        }
+
+        if tier not in PRICE_MAP:
+            return jsonify({"error": "Invalid tier requested"}), 400
+
+        price_id = PRICE_MAP[tier].get(interval)
+        
+        if not price_id or 'placeholder' in price_id:
+             # Fallback for demo/missing config: Create a one-time payment or simple price if testing
+             # In a real app, you MUST have these price IDs pre-configured in Stripe
+             print(f"Warning: Using placeholder or missing price ID for {tier} {interval}")
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': f'LogiMatch AI - {tier} Plan',
+                        'description': f'Unlocking {tier} features for your organization',
+                    },
+                    'unit_amount': int(float(price) * 100), # Amount in cents
+                    'recurring': {
+                        'interval': interval,
+                    },
+                },
+                'quantity': 1,
+            }],
+            mode='subscription',
+            success_url=f"{FRONTEND_URL}/settings/billing?success=true&session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{FRONTEND_URL}/settings/billing?canceled=true",
+        )
+
+        return jsonify({'url': session.url})
+    except Exception as e:
+        print(f"Stripe Error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 # --- Surcharge Endpoints ---
 @app.route('/api/surcharges', methods=['GET', 'POST'])
