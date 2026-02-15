@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 
-export type Tier = 'BASE' | 'PRO' | 'ELITE'
+export type Tier = 'BASE' | 'PRO' | 'ENTERPRISE'
 
 interface SubscriptionContextType {
     tier: Tier
@@ -17,7 +17,7 @@ const SubscriptionContext = createContext<SubscriptionContextType | undefined>(u
 const TIER_LEVELS: Record<Tier, number> = {
     'BASE': 1,
     'PRO': 2,
-    'ELITE': 3
+    'ENTERPRISE': 3
 }
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
