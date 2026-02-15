@@ -147,7 +147,7 @@ export default function LegalCenterPage() {
 
                                     <div className="space-y-4">
                                         <h3 className="text-xl font-bold text-foreground">1. Subscription Tiers</h3>
-                                        <p className="text-muted-foreground">LogiMatch offers Pilot, Accelerator, and Elite tiers. "Elite" pricing is custom-quoted via our sales team and governed by a separate Master Service Agreement (MSA).</p>
+                                        <p className="text-muted-foreground">LogiMatch offers Pilot, Accelerator, and Enterprise tiers. "Enterprise" pricing is custom-quoted via our sales team and governed by a separate Master Service Agreement (MSA).</p>
                                     </div>
 
                                     <div className="space-y-4">

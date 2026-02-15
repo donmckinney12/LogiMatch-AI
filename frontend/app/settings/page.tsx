@@ -330,7 +330,7 @@ export default function SettingsPage() {
                                 {[
                                     { title: "Privacy Policy", desc: "How we secure your sensitive logistics telemetry.", icon: Lock, link: "/settings/legal" },
                                     { title: "Terms of Service", desc: "Agreement on platform usage and limitations.", icon: Scale, link: "/settings/legal" },
-                                    { title: "Refund Policy", desc: "Clarification on custom-quoted 'Elite' billing.", icon: FileText, link: "/settings/legal" },
+                                    { title: "Refund Policy", desc: "Clarification on custom-quoted 'Enterprise' billing.", icon: FileText, link: "/settings/legal" },
                                     { title: "AI Accuracy Disclaimer", desc: "Neural model probability and limit of liability.", icon: AlertCircle, link: "/settings/legal" },
                                 ].map((doc, i) => (
                                     <div key={i} className="p-6 rounded-2xl border border-border hover:border-primary/40 transition-all group flex items-start gap-4">

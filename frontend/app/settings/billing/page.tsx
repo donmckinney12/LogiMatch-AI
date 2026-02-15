@@ -233,14 +233,14 @@ export default function BillingPage() {
 
                         <Card className={cn(
                             "border-border bg-card glass-card overflow-hidden relative",
-                            usage?.subscription_tier === 'ELITE' && "ring-2 ring-indigo-600 dark:ring-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.2)]"
+                            usage?.subscription_tier === 'ENTERPRISE' && "ring-2 ring-indigo-600 dark:ring-indigo-500 shadow-[0_0_30px_rgba(79,70,229,0.2)]"
                         )}>
                             <div className="absolute top-0 right-0 p-3">
                                 <Zap className="text-indigo-500 animate-pulse" size={20} />
                             </div>
                             <CardHeader>
                                 <CardTitle className="flex items-center justify-between font-black tracking-tight text-foreground uppercase text-xs">
-                                    <span>Elite Tier</span>
+                                    <span>Enterprise Tier</span>
                                     <Badge className="bg-indigo-600 text-white border-none font-black text-[10px] tracking-widest">ENTERPRISE</Badge>
                                 </CardTitle>
                                 <CardDescription className="text-muted-foreground font-medium">Unlimited scale for global logistics Corridors.</CardDescription>
@@ -259,11 +259,11 @@ export default function BillingPage() {
                             </CardContent>
                             <CardFooter>
                                 <button
-                                    disabled={usage?.subscription_tier === 'ELITE'}
+                                    disabled={usage?.subscription_tier === 'ENTERPRISE'}
                                     onClick={() => window.location.href = '/contact?plan=elite'}
                                     className="w-full py-3 bg-indigo-600 text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:opacity-90 disabled:opacity-30 transition-all shadow-lg shadow-indigo-600/20"
                                 >
-                                    {usage?.subscription_tier === 'ELITE' ? 'Current Plan' : 'Contact Sales'}
+                                    {usage?.subscription_tier === 'ENTERPRISE' ? 'Current Plan' : 'Contact Sales'}
                                 </button>
                             </CardFooter>
                         </Card>
