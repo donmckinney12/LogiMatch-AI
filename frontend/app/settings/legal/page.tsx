@@ -178,7 +178,7 @@ export default function LegalCenterPage() {
 
                                     <div className="space-y-4">
                                         <h3 className="text-xl font-bold text-foreground">1. No Professional Advice</h3>
-                                        <p className="text-muted-foreground">Recommendations provided by the "Neural Copilot" do not constitute legal, financial, or certified supply-chain auditing advice.</p>
+                                        <p className="text-muted-foreground">Recommendations provided by "Atlas" do not constitute legal, financial, or certified supply-chain auditing advice.</p>
                                     </div>
 
                                     <div className="space-y-4">

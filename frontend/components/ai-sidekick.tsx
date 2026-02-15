@@ -24,7 +24,7 @@ export function AISidekick() {
         {
             id: "welcome",
             role: "assistant",
-            content: "Hello! I'm your LogiMatch Copilot. I can help you navigate, summarize data, or draft communications. How can I assist you today?",
+            content: "Hello! I'm Atlas, your LogiMatch AI assistant. I can help you navigate, summarize data, or draft communications. How can I assist you today?",
             timestamp: new Date()
         }
     ])
@@ -131,7 +131,7 @@ export function AISidekick() {
                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#151921] shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                             </div>
                             <div>
-                                <h3 className="font-black text-sm tracking-tight text-white uppercase">Neural Copilot</h3>
+                                <h3 className="font-black text-sm tracking-tight text-white uppercase">Atlas</h3>
                                 <p className="text-[9px] text-primary font-black uppercase tracking-[0.2em]">Core v4.2 Active</p>
                             </div>
                         </div>
@@ -215,7 +215,7 @@ export function AISidekick() {
                             <Input
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder="Sync with Neural Copilot..."
+                                placeholder="Sync with Atlas..."
                                 className="h-14 pl-6 pr-14 bg-white/[0.03] border-white/10 rounded-2xl text-sm font-medium placeholder:text-white/20 focus-visible:ring-primary/30 focus-visible:bg-white/[0.06] transition-all"
                             />
                             <Button
