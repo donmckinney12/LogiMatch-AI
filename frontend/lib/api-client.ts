@@ -1,5 +1,5 @@
 export async function apiRequest(endpoint: string, options: RequestInit = {}, orgId?: string) {
-    const baseUrl = "http://localhost:5000";
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
     const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
 
     const headers = new Headers(options.headers || {});
