@@ -11,6 +11,8 @@ services:
         value: 3.11.0
       - key: OPENAI_API_KEY
         sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
       - key: DATABASE_URL
         value: sqlite:///logimatch_v4.db
       - key: FLASK_ENV

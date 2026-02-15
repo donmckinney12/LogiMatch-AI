@@ -16,6 +16,7 @@
    
    ```
    OPENAI_API_KEY=<your-openai-api-key>
+   CLERK_SECRET_KEY=<your-clerk-secret-key>
    DATABASE_URL=sqlite:///logimatch_v4.db
    FLASK_ENV=production
    ```
