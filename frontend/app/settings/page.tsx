@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { AppLayout } from "@/components/app-layout"
-import { Plus, Trash2, Check, X, Mail, Zap } from "lucide-react"
+import { Plus, Trash2, Check, X, Mail, Zap, Shield, Lock, Scale, FileText, AlertCircle } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 
