@@ -5,6 +5,8 @@ import { HardDrive, BarChart3, ShieldCheck, Zap } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
+import { apiRequest } from '@/lib/api-client'
+
 export function UsageWidget() {
     const [usage, setUsage] = useState<any>(null)
     const [loading, setLoading] = useState(true)
@@ -12,8 +14,7 @@ export function UsageWidget() {
     useEffect(() => {
         const fetchUsage = async () => {
             try {
-                const res = await fetch('http://localhost:5000/api/usage?user_id=PilotUser_01')
-                const data = await res.json()
+                const data = await apiRequest('/api/usage?user_id=PilotUser_01')
                 setUsage(data)
             } catch (e) {
                 console.error("Usage fetch failed", e)
@@ -84,6 +85,12 @@ export function UsageWidget() {
                         <span>Role: ADMIN</span>
                     </div>
                     <span className="text-green-600 font-bold uppercase text-[10px]">VERIFIED</span>
+                </div>
+
+                {/* Deployment Signature */}
+                <div className="pt-1 flex items-center justify-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-blue-500/50">
+                    <Zap size={8} fill="currentColor" />
+                    <span>Production Sync Active</span>
                 </div>
             </div>
 
