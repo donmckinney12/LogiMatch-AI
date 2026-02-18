@@ -16,7 +16,9 @@ import {
     User,
     History,
     Search,
-    Loader2
+    Loader2,
+    Code,
+    Zap
 } from "lucide-react"
 
 import {
@@ -40,6 +42,8 @@ const Icons: any = {
     User: User,
     Settings: Settings
 }
+
+import { apiRequest } from "@/lib/api-client"
 
 export function GlobalSearch() {
     const [open, setOpen] = React.useState(false)
@@ -66,19 +70,17 @@ export function GlobalSearch() {
             return
         }
 
-        const timeoutId = setTimeout(() => {
+        const timeoutId = setTimeout(async () => {
             if (query.length > 2) {
                 setLoading(true)
-                fetch(`http://localhost:5000/api/search/global?query=${query}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        setResults(data)
-                        setLoading(false)
-                    })
-                    .catch(err => {
-                        console.error(err)
-                        setLoading(false)
-                    })
+                try {
+                    const data = await apiRequest(`/api/search/global?query=${query}`)
+                    setResults(data)
+                } catch (err) {
+                    console.error(err)
+                } finally {
+                    setLoading(false)
+                }
             } else {
                 setResults([])
             }
@@ -215,6 +217,31 @@ export function GlobalSearch() {
                             <CommandItem onSelect={() => runCommand(() => router.push("/admin/audit"))}>
                                 <History className="mr-2 h-4 w-4" />
                                 <span>Audit Log</span>
+                            </CommandItem>
+                        </CommandGroup>
+
+                        <CommandSeparator />
+
+                        <CommandGroup heading="Enterprise Resources">
+                            <CommandItem onSelect={() => runCommand(() => router.push("/docs/quick-start"))}>
+                                <Zap className="mr-2 h-4 w-4 text-primary" />
+                                <span>Quick Start Guide</span>
+                            </CommandItem>
+                            <CommandItem onSelect={() => runCommand(() => router.push("/docs"))}>
+                                <FileText className="mr-2 h-4 w-4" />
+                                <span>Documentation</span>
+                            </CommandItem>
+                            <CommandItem onSelect={() => runCommand(() => router.push("/blog"))}>
+                                <LayoutDashboard className="mr-2 h-4 w-4" />
+                                <span>Engineering Blog</span>
+                            </CommandItem>
+                            <CommandItem onSelect={() => runCommand(() => router.push("/api-reference"))}>
+                                <Code className="mr-2 h-4 w-4" />
+                                <span>API Reference</span>
+                            </CommandItem>
+                            <CommandItem onSelect={() => runCommand(() => router.push("/case-studies"))}>
+                                <Package className="mr-2 h-4 w-4" />
+                                <span>Case Studies</span>
                             </CommandItem>
                         </CommandGroup>
                     </>

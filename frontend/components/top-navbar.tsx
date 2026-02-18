@@ -103,21 +103,18 @@ export function TopNavbar() {
     return (
         <>
             {/* Main Navbar */}
-            <div className="fixed top-0 left-0 right-0 z-[100] bg-red-600 text-white text-[10px] font-black text-center py-1 uppercase tracking-widest">
-                VERIFICATION BANNER V1: IF YOU SEE THIS, YOU ARE ON COMPONENTS/TOP-NAVBAR.TSX
-            </div>
-            <nav className="fixed top-1 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-                <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
+            <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[1700px] z-50 rounded-[28px] border border-white/10 bg-background/60 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] glass-card">
+                <div className="px-6 lg:px-10">
                     <div className="flex h-16 items-center justify-between">
                         {/* Left: Logo + Desktop Categories */}
                         <div className="flex items-center gap-8">
-                            <Link href="/" className="flex items-center gap-2 group mr-4">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-blue-600 shadow-lg shadow-primary/20 transition-all group-hover:shadow-primary/40 group-active:scale-95">
-                                    <Zap size={18} className="text-primary-foreground fill-current" />
+                            <Link href="/" className="flex items-center gap-3 group mr-4">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-blue-500 to-indigo-600 shadow-xl shadow-primary/20 transition-all group-hover:shadow-primary/40 group-active:scale-95 group-hover:rotate-12">
+                                    <Zap size={22} className="text-primary-foreground fill-current drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]" />
                                 </div>
                                 <div className="hidden xl:block">
-                                    <span className="font-heading text-lg font-black tracking-tighter text-foreground uppercase italic leading-none">LogiMatch</span>
-                                    <span className="ml-0.5 font-heading text-lg font-black tracking-tighter text-primary uppercase italic leading-none">AI</span>
+                                    <span className="font-heading text-xl font-black tracking-tighter text-foreground uppercase italic leading-none transition-colors group-hover:text-primary">LogiMatch</span>
+                                    <span className="ml-1 font-heading text-xl font-black tracking-tighter text-primary uppercase italic leading-none">AI</span>
                                 </div>
                             </Link>
                         </div>

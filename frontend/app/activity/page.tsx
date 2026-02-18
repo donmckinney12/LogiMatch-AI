@@ -12,6 +12,8 @@ type AuditLog = {
     user_id: string
 }
 
+import { apiRequest } from "@/lib/api-client"
+
 export default function ActivityPage() {
     const [logs, setLogs] = useState<AuditLog[]>([])
     const [loading, setLoading] = useState(true)
@@ -22,10 +24,8 @@ export default function ActivityPage() {
 
     const fetchLogs = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/audit-logs")
-            if (res.ok) {
-                setLogs(await res.json())
-            }
+            const data = await apiRequest("/api/audit-logs")
+            setLogs(data)
         } catch (e) {
             console.error("Failed to fetch logs", e)
         } finally {

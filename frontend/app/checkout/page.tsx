@@ -11,6 +11,8 @@ import { CreditCard, Lock, ArrowLeft, CheckCircle, Loader2 } from 'lucide-react'
 import { useUser } from '@clerk/nextjs'
 import { toast } from 'sonner'
 
+import { apiRequest } from '@/lib/api-client'
+
 function CheckoutContent() {
     const searchParams = useSearchParams()
     const router = useRouter()
@@ -27,20 +29,15 @@ function CheckoutContent() {
         setIsProcessing(true)
 
         try {
-            const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'
-            const response = await fetch(`${apiBaseUrl}/api/create-checkout-session`, {
+            const data = await apiRequest('/api/create-checkout-session', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     tier,
                     price,
                     interval,
+                    user_id: user?.id
                 }),
             })
-
-            const data = await response.json()
 
             if (data.url) {
                 // Redirect to Stripe Checkout

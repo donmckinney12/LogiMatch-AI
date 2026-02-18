@@ -22,6 +22,8 @@ type Carrier = {
 
 const columnHelper = createColumnHelper<Carrier>()
 
+import { apiRequest } from '@/lib/api-client'
+
 export function CarrierTable() {
     const [data, setData] = useState<Carrier[]>([])
     const [sorting, setSorting] = useState<SortingState>([])
@@ -32,11 +34,8 @@ export function CarrierTable() {
 
     const fetchCarriers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/carriers')
-            if (res.ok) {
-                const carriers = await res.json()
-                setData(carriers)
-            }
+            const carriers = await apiRequest('/api/carriers')
+            setData(carriers)
         } catch (e) {
             console.error("Failed to fetch carriers", e)
         }

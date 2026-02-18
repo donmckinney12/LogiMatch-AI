@@ -71,13 +71,12 @@ export function SearchModal() {
             {/* Trigger Button */}
             <button
                 onClick={() => setOpen(true)}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 text-sm text-muted-foreground bg-muted/50 border border-border/50 rounded-lg hover:bg-muted transition-all w-full max-w-md"
+                className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all active:scale-95 group relative"
             >
-                <Search size={16} />
-                <span>Search...</span>
-                <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
-                    <Command size={10} />K
-                </kbd>
+                <Search size={20} className="group-hover:scale-110 transition-transform" />
+                <span className="sr-only">Search (Cmd+K)</span>
+                {/* Subtle Indicator */}
+                <div className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-primary/40 group-hover:bg-primary transition-colors" />
             </button>
 
             {/* Mobile Search Button */}
@@ -93,13 +92,13 @@ export function SearchModal() {
                 <DialogContent className="max-w-2xl p-0 gap-0">
                     <DialogHeader className="px-4 pt-4 pb-0">
                         <DialogTitle className="sr-only">Search</DialogTitle>
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                        <div className="relative group">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
                             <Input
                                 placeholder="Search pages, features, settings..."
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                className="pl-10 pr-10 h-12 text-base border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                                className="pl-10 pr-10 h-14 text-lg border-0 focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
                                 autoFocus
                             />
                             {query && (
@@ -110,6 +109,20 @@ export function SearchModal() {
                                     <X size={18} />
                                 </button>
                             )}
+                        </div>
+                        <div className="px-4 pb-3 flex items-center gap-2">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Discovery:</span>
+                            <div className="flex gap-2">
+                                {['Check Compliance', 'View Quote Matrix', 'Audit Invoices'].map((hint) => (
+                                    <button
+                                        key={hint}
+                                        onClick={() => setQuery(hint)}
+                                        className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors hover:underline decoration-primary/30 underline-offset-4"
+                                    >
+                                        "{hint}"
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </DialogHeader>
 

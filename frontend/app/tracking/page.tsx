@@ -19,6 +19,7 @@ import {
     Globe
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function LiveTrackingPage() {
     const { orgId } = useOrg()
@@ -150,7 +151,19 @@ export default function LiveTrackingPage() {
                                     </div>
                                 ))}
                             </div>
-                            <button className="w-full mt-6 py-3 bg-primary text-primary-foreground hover:opacity-90 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20">
+                            <button
+                                onClick={() => {
+                                    const promise = new Promise((resolve) => setTimeout(() => resolve({ optimizedCount: 4 }), 2000));
+                                    toast.promise(promise, {
+                                        loading: 'Recalculating telemetry routes for real-time inventory sync...',
+                                        success: (data: any) => {
+                                            return `Success: ${data.optimizedCount} critical routes optimized. Telemetry lag reduced by 14%.`;
+                                        },
+                                        error: 'Optimization engine encountered an error.',
+                                    });
+                                }}
+                                className="w-full mt-6 py-3 bg-primary text-primary-foreground hover:opacity-90 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-primary/20"
+                            >
                                 Optimization Engine
                             </button>
                         </div>

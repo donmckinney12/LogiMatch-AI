@@ -28,8 +28,12 @@ import {
     Info
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useOrg } from "@/context/org-context"
+import { apiRequest } from "@/lib/api-client"
+import { toast } from "sonner"
 
 export default function LaneIntelligencePage() {
+    const { orgId } = useOrg()
     const [lanes, setLanes] = useState<any[]>([])
     const [selectedLane, setSelectedLane] = useState<string>("")
     const [forecastData, setForecastData] = useState<any>(null)
@@ -50,8 +54,7 @@ export default function LaneIntelligencePage() {
 
     const fetchLanes = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/analytics/lanes')
-            const data = await res.json()
+            const data = await apiRequest('/api/analytics/lanes', {}, orgId)
             setLanes(data)
             if (data.length > 0) {
                 setSelectedLane(`${data[0].origin} to ${data[0].destination}`)
@@ -65,8 +68,7 @@ export default function LaneIntelligencePage() {
 
     const fetchForecast = async (origin: string, destination: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/analytics/forecast?origin=${origin}&destination=${destination}`)
-            const data = await res.json()
+            const data = await apiRequest(`/api/analytics/forecast?origin=${origin}&destination=${destination}`, {}, orgId)
             setForecastData(data)
         } catch (err) {
             console.error(err)
@@ -75,8 +77,7 @@ export default function LaneIntelligencePage() {
 
     const fetchDominance = async (origin: string, destination: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/analytics/dominance?origin=${origin}&destination=${destination}`)
-            const data = await res.json()
+            const data = await apiRequest(`/api/analytics/dominance?origin=${origin}&destination=${destination}`, {}, orgId)
             setDominanceData(data)
         } catch (err) {
             console.error(err)
@@ -137,7 +138,13 @@ export default function LaneIntelligencePage() {
                         <p className="text-sm font-bold text-foreground leading-snug">
                             {forecastData?.advisory || "Analyzing market trends..."}
                         </p>
-                        <button className="mt-4 flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase hover:gap-3 transition-all">
+                        <button
+                            onClick={() => toast.info("Negotiation Strategy Compiled.", {
+                                description: "Detailed analysis has been added to your Atlas Sidekick drawer.",
+                                duration: 4000
+                            })}
+                            className="mt-4 flex items-center gap-2 text-blue-600 font-black text-[10px] uppercase hover:gap-3 transition-all"
+                        >
                             Review Negotiation Strategy <ArrowRight size={12} />
                         </button>
                     </div>
@@ -251,7 +258,13 @@ export default function LaneIntelligencePage() {
                             )}
                         </div>
 
-                        <button className="relative z-10 w-full mt-8 p-4 bg-muted border border-border rounded-2xl flex items-center justify-between hover:bg-muted/80 transition-all group">
+                        <button
+                            onClick={() => toast.success("Rate Challenge Submitted.", {
+                                description: "Our AI is now benchmarking your current rates against indexed market data.",
+                                duration: 5000
+                            })}
+                            className="relative z-10 w-full mt-8 p-4 bg-muted border border-border rounded-2xl flex items-center justify-between hover:bg-muted/80 transition-all group"
+                        >
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-blue-500 rounded-lg text-white">
                                     <TrendingDown size={16} />

@@ -1,284 +1,134 @@
-"use client"
+import Link from "next/link"
+import { AppLayout } from "@/components/app-layout"
+import { SiteFooter } from "@/components/site-footer"
+import { TestimonialsSection } from "@/components/testimonials-section"
+import { BlogPreview } from "@/components/blog-preview"
+import { LogoStrip } from "@/components/logo-strip"
+import { ArrowRight, Zap, ShieldCheck, BarChart3, Globe, ChevronRight, Calendar } from "lucide-react"
 
-import { useState, useCallback, useEffect } from 'react'
-import { useUser } from '@clerk/nextjs'
-import { useDropzone } from 'react-dropzone'
-import {
-  Upload,
-  FileText,
-  AlertCircle,
-  CheckCircle,
-  Loader2,
-  Plus,
-  TrendingUp,
-  Activity,
-  Globe,
-  Zap,
-  CreditCard,
-  LayoutGrid
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import { ComparisonTable } from '@/components/comparison-table'
-import { AppLayout } from '@/components/app-layout'
-import { UsageWidget } from '@/components/usage-widget'
-import { useOrg } from "@/context/org-context"
-import { apiRequest } from "@/lib/api-client"
-// Recharts
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-
-// Mock Data for Hero Chart
-const activityData = [
-  { time: '08:00', quotes: 12, volume: 4500 },
-  { time: '10:00', quotes: 18, volume: 6200 },
-  { time: '12:00', quotes: 15, volume: 5100 },
-  { time: '14:00', quotes: 25, volume: 8900 },
-  { time: '16:00', quotes: 30, volume: 9200 },
-  { time: '18:00', quotes: 22, volume: 7400 },
-];
-
-export default function Home() {
-  const { user } = useUser()
-  const { orgId } = useOrg()
-  const [loading, setLoading] = useState(false)
-  const [quotes, setQuotes] = useState<any[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const [normalizationEnabled, setNormalizationEnabled] = useState(false)
-
-  // Fetch initial quotes from DB
-  useEffect(() => {
-    fetchQuotes()
-  }, [orgId])
-
-  const fetchQuotes = async () => {
-    try {
-      const data = await apiRequest('/api/quotes', {}, orgId)
-      setQuotes(Array.isArray(data) ? data : [])
-    } catch (err) {
-      console.error("Failed to fetch history", err)
-      setQuotes([])
-    }
-  }
-
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    setLoading(true)
-    setError(null)
-
-    // Process files sequentially
-    for (const file of acceptedFiles) {
-      if (file.type !== 'application/pdf') continue;
-
-      const formData = new FormData()
-      formData.append('file', file)
-      if (user?.id) {
-        formData.append('user_id', user.id)
-      }
-
-      try {
-        const data = await apiRequest('/api/extract', {
-          method: 'POST',
-          body: formData,
-        }, orgId)
-
-        // Backend now returns the saved quote object directly
-        await fetchQuotes() // Re-fetch to ensure sync with DB ID
-      } catch (err: any) {
-        setError(`Failed to process ${file.name}: ${err.message} `)
-      }
-    }
-    setLoading(false)
-  }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { 'application/pdf': ['.pdf'] }
-  })
-
+export default function LandingPage() {
   return (
     <AppLayout>
-      <div className="max-w-[1800px] mx-auto space-y-4 lg:space-y-8 animate-in fade-in duration-700">
+      <main className="relative">
+        <div className="bg-mesh opacity-70" aria-hidden="true" />
 
-        {/* 1. Header Section with Spotlight Feel */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 pb-6 border-b border-border/40">
-          <div className="space-y-2">
-            <h1 className="text-3xl md:text-5xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/60">
-              Mission Control
-            </h1>
-            <p className="text-base md:text-lg text-muted-foreground font-medium max-w-2xl">
-              Welcome back. Global freight activity is <span className="text-emerald-500 font-bold italic underline decoration-emerald-500/30">trending up</span> today.
-            </p>
+        {/* Hero Section */}
+        <section className="relative pt-24 pb-16 lg:pt-40 lg:pb-32 overflow-hidden">
+          <div className="bg-grid opacity-30" aria-hidden="true" />
+
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1400px] h-full pointer-events-none">
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/20 rounded-full blur-[160px] opacity-40 animate-pulse" />
+            <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-blue-600/20 rounded-full blur-[160px] opacity-40 animate-bounce-slow" />
           </div>
 
-          {/* Normalization Toggle - Enterprise Pill Style */}
-          <div className="flex items-center gap-1 p-1 bg-card border border-border rounded-full shadow-sm glass-card w-full md:w-auto">
-            <button
-              onClick={() => setNormalizationEnabled(false)}
-              className={cn(
-                "flex-1 md:flex-none px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all",
-                !normalizationEnabled ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted"
-              )}
-            >
-              Original
-            </button>
-            <button
-              onClick={() => setNormalizationEnabled(true)}
-              className={cn(
-                "flex-1 md:flex-none px-4 py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-widest transition-all",
-                normalizationEnabled ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted"
-              )}
-            >
-              Normalized USD
-            </button>
-          </div>
-        </div>
+          <div className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10">
+            <div className="text-center">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/30 mb-8 animate-in slide-in-from-top-4 shadow-[0_0_20px_rgba(59,130,246,0.2)]">
+                <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(59,130,246,1)]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">System Online: Enterprise v5.0 Beta</span>
+              </div>
 
-        {/* 2. Bento Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
+              <h1 className="text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter text-foreground italic uppercase leading-[0.8] mb-8 drop-shadow-2xl">
+                Normalize <span className="text-primary-foreground drop-shadow-[0_2px_10px_rgba(59,130,246,0.5)]">Data</span> <br />
+                <span className="text-primary italic animate-glow">& Predict Spikes.</span>
+              </h1>
 
-          {/* Start Column: Global Activity Hero (Spans 8) */}
-          <div className="lg:col-span-8 p-6 md:p-8 bg-card rounded-[32px] md:rounded-[40px] border border-border shadow-2xl glass-card relative overflow-hidden group">
-            {/* Background Glow */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none" />
+              <p className="mx-auto mt-8 max-w-3xl text-xl md:text-3xl font-medium text-muted-foreground leading-relaxed balance opacity-90">
+                The neural core for global procurement. <span className="text-foreground font-bold border-b-2 border-primary/40">Consolidate manifests</span>, automate spend audits, and predict market shifts in milliseconds.
+              </p>
 
-            <div className="relative z-10 flex flex-col h-full justify-between min-h-[250px] md:min-h-[300px]">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 md:p-3 bg-primary/10 rounded-2xl text-primary">
-                    <Globe size={20} className="md:w-6 md:h-6" />
+              <div className="mt-14 flex flex-col sm:flex-row items-center justify-center gap-6">
+                <Link href="/contact" className="w-full sm:w-auto px-12 py-7 bg-primary text-primary-foreground font-black uppercase text-xs tracking-[0.3em] rounded-[24px] hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-primary/50 flex items-center justify-center gap-3 group overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                  <Calendar size={20} /> Book a Demo
+                </Link>
+                <Link href="/dashboard" className="w-full sm:w-auto px-12 py-7 bg-white/5 border border-white/20 text-foreground font-black uppercase text-xs tracking-[0.3em] rounded-[24px] hover:bg-white/10 backdrop-blur-md transition-all flex items-center justify-center gap-3 group shadow-xl">
+                  Start Free Audit <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
+                </Link>
+              </div>
+
+              {/* Trust Bar */}
+              <div className="mt-24 opacity-60 hover:opacity-100 transition-opacity duration-700">
+                <LogoStrip />
+              </div>
+
+              {/* Sub-Hero Terminal Preview */}
+              <div className="mt-24 lg:mt-40 max-w-6xl mx-auto rounded-[64px] border border-white/10 bg-[#0A0C10]/80 p-6 shadow-[0_64px_128px_-20px_rgba(0,0,0,0.8)] glass-card transition-all duration-1000 overflow-hidden relative group hover:scale-[1.02] hover:border-primary/40">
+                <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
+                <div className="aspect-[21/9] w-full bg-[#050608] rounded-[48px] flex items-center justify-center relative overflow-hidden ring-1 ring-white/5">
+                  <img
+                    src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=2000"
+                    alt="LogiMatch AI Analytics Core"
+                    className="absolute inset-0 w-full h-full object-cover opacity-30 grayscale group-hover:grayscale-0 transition-all duration-1000"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0C10] via-transparent to-transparent" />
+                  <div className="relative z-10 text-center space-y-6">
+                    <div className="p-8 bg-primary/20 backdrop-blur-3xl rounded-[32px] inline-block shadow-2xl border border-primary/30 neon-glow">
+                      <Zap className="text-primary" size={64} fill="currentColor" />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-xs font-black uppercase tracking-[0.8em] text-primary drop-shadow-[0_0_10px_rgba(59,130,246,0.5)]">Mission Control v5.0</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Neural Logistics Core Active</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-base md:text-lg font-black text-foreground uppercase tracking-wide">Global Trade Velocity</h3>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">Real-time Quote Ingestion</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Grid */}
+        <section className="py-24 bg-muted/20">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { icon: Zap, title: "Auto-Auditor", desc: "Instantly find overcharges in messy PDF manifests and convert them to clean USD landed costs." },
+                { icon: BarChart3, title: "Savings Tracker", desc: "Watch your actual savings grow in real-time versus carrier benchmarks." },
+                { icon: ShieldCheck, title: "Disruption Shield", desc: "Get alerted to lane vulnerabilities before they cost you thousands in delays." },
+                { icon: Globe, title: "Rate Benchmarking", desc: "Direct access to real-time market rates so you know if your carrier is overcharging." },
+              ].map((f, i) => (
+                <div key={i} className="p-8 bg-card rounded-[32px] border border-border/40 hover:border-primary/50 transition-all group shadow-sm">
+                  <div className="p-3 bg-primary/10 rounded-2xl text-primary w-fit mb-6 group-hover:scale-110 transition-transform">
+                    <f.icon size={24} />
                   </div>
+                  <h3 className="text-xl font-black uppercase tracking-tight italic mb-3">{f.title}</h3>
+                  <p className="text-sm font-medium text-muted-foreground leading-relaxed">{f.desc}</p>
                 </div>
-                <div className="flex items-center gap-2 text-emerald-500 bg-emerald-500/10 px-2 py-1 md:px-3 md:py-1.5 rounded-full border border-emerald-500/20">
-                  <Activity size={14} className="animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Live</span>
-                </div>
-              </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-              {/* Hero Chart */}
-              <div className="flex-1 w-full h-[180px] md:h-[200px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={activityData}>
-                    <defs>
-                      <linearGradient id="colorActivity" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                      <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feGaussianBlur stdDeviation="5" result="blur" />
-                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                      </filter>
-                    </defs>
-                    <Tooltip
-                      cursor={{ stroke: 'var(--muted-foreground)', strokeWidth: 1, strokeDasharray: '4 4' }}
-                      contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '12px', border: '1px solid var(--border)' }}
-                      itemStyle={{ color: 'var(--foreground)', fontSize: '12px', fontWeight: 'bold' }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="volume"
-                      className="neon-glow"
-                      stroke="#3b82f6"
-                      strokeWidth={4}
-                      fillOpacity={1}
-                      fill="url(#colorActivity)"
-                      strokeLinecap="round"
-                      filter="url(#glow)"
-                      animationDuration={2500}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+        {/* Social Proof */}
+        <TestimonialsSection />
+
+        {/* CTA Section */}
+        <section className="py-24 relative overflow-hidden">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="bg-primary rounded-[48px] p-12 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-primary/40 group">
+              <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10">
+                <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white italic uppercase mb-8">
+                  Ready to Optimize your <br />
+                  Global Procurement?
+                </h2>
+                <p className="mt-6 text-lg text-primary-foreground/80 font-medium max-w-2xl mx-auto mb-10">
+                  Join the world's leading brands using LogiMatch AI to gain strategic advantage in global logistics.
+                </p>
+                <Link href="/dashboard" className="inline-flex px-10 py-6 bg-white text-primary font-black uppercase tracking-widest rounded-2xl hover:scale-110 active:scale-95 transition-all shadow-xl">
+                  Get Started Free
+                </Link>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Right Column: Stats Tiles (Spans 4) */}
-          <div className="lg:col-span-4 grid grid-cols-1 gap-4 lg:gap-6">
-            {/* Usage Widget Card */}
-            <div className="bg-card rounded-[32px] border border-border shadow-lg glass-card overflow-hidden relative">
-              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-500" />
-              <div className="p-2">
-                <UsageWidget />
-              </div>
-            </div>
+        {/* Articles/Blog */}
+        <BlogPreview />
 
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 md:p-6 bg-card rounded-[24px] md:rounded-[32px] border border-border glass-card flex flex-col justify-center items-center text-center hover:border-primary/50 transition-colors">
-                <span className="text-3xl md:text-4xl font-black text-foreground mb-1">{quotes.length}</span>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Quotes</span>
-              </div>
-              <div className="p-4 md:p-6 bg-card rounded-[24px] md:rounded-[32px] border border-border glass-card flex flex-col justify-center items-center text-center hover:border-primary/50 transition-colors">
-                <div className="flex items-center gap-1 text-emerald-500 mb-1">
-                  <TrendingUp size={16} className="md:w-5 md:h-5" />
-                  <span className="text-xl md:text-2xl font-black">12%</span>
-                </div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">MoM Growth</span>
-              </div>
-            </div>
-          </div>
+      </main>
 
-          {/* Bottom Row: Upload & Table (Spans 12 each) */}
-
-          {/* Upload Area - The "Drop Zone" */}
-          <div className="lg:col-span-12">
-            <div
-              {...getRootProps()}
-              className={cn(
-                "relative border-2 border-dashed rounded-[32px] md:rounded-[40px] p-8 md:p-12 text-center cursor-pointer transition-all duration-300 group overflow-hidden",
-                isDragActive
-                  ? "border-primary bg-primary/5 scale-[1.01] shadow-2xl shadow-primary/20"
-                  : "border-border hover:border-primary/50 hover:bg-muted/10"
-              )}
-            >
-              <input {...getInputProps()} />
-              <div className="absolute inset-0 bg-mesh opacity-0 group-hover:opacity-20 transition-opacity duration-700" />
-
-              <div className="relative z-10 flex flex-col items-center gap-4 md:gap-6">
-                <div className={cn(
-                  "p-4 md:p-6 rounded-full bg-card border border-border shadow-xl transform transition-transform duration-500",
-                  isDragActive ? "scale-125 rotate-12" : "group-hover:scale-110"
-                )}>
-                  {loading ? <Loader2 size={24} className="md:w-8 md:h-8 animate-spin text-primary" /> : <Upload size={24} className="md:w-8 md:h-8 text-primary" />}
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl md:text-2xl font-black text-foreground">
-                    {isDragActive ? "Drop Manifest Here" : "Upload Freight Quote"}
-                  </h3>
-                  <p className="text-sm md:text-base text-muted-foreground font-medium max-w-sm md:max-w-md mx-auto">
-                    Drag & drop PDF files to instantly extract, normalize, and analyze freight rates using our enterprise OCR engine.
-                  </p>
-                </div>
-              </div>
-            </div>
-            {error && (
-              <div className="mt-4 p-4 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive flex items-center gap-2 font-bold animate-in slide-in-from-top-2 text-sm">
-                <AlertCircle size={18} /> {error}
-              </div>
-            )}
-          </div>
-
-          {/* Comparison Table */}
-          <div className="lg:col-span-12">
-            <div className="bg-card rounded-[40px] border border-border shadow-xl glass-card overflow-hidden">
-              <div className="p-8 border-b border-border flex justify-between items-center bg-muted/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/10 rounded-xl text-primary">
-                    <LayoutGrid size={20} />
-                  </div>
-                  <h3 className="text-lg font-black text-foreground uppercase tracking-wide">Quote Matrix</h3>
-                </div>
-                <button className="px-4 py-2 bg-background border border-border rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-muted transition-colors">
-                  Export CSV
-                </button>
-              </div>
-              <ComparisonTable data={quotes} normalizationEnabled={normalizationEnabled} />
-            </div>
-          </div>
-
-        </div>
-      </div>
+      <SiteFooter />
     </AppLayout>
   )
 }

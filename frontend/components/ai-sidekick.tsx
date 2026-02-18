@@ -17,6 +17,8 @@ interface Message {
     actions?: any[]
 }
 
+import { apiRequest } from "@/lib/api-client"
+
 export function AISidekick() {
     const [isOpen, setIsOpen] = React.useState(false)
     const [input, setInput] = React.useState("")
@@ -55,16 +57,13 @@ export function AISidekick() {
         setIsLoading(true)
 
         try {
-            const res = await fetch('http://localhost:5000/api/ai/chat', {
+            const data = await apiRequest('/api/ai/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: userMsg.content,
                     context: { page: pathname }
                 })
             })
-
-            const data = await res.json()
 
             if (data.error) throw new Error(data.error)
 

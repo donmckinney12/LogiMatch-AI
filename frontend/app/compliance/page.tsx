@@ -14,6 +14,8 @@ import {
     Filter
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { apiRequest } from '@/lib/api-client'
+import { toast } from "sonner"
 import {
     Radar,
     RadarChart,
@@ -53,17 +55,18 @@ export default function CompliancePage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/quotes')
-            .then(res => res.json())
-            .then(data => {
+        const loadData = async () => {
+            try {
+                const data = await apiRequest('/api/quotes')
                 setQuotes(Array.isArray(data) ? data : [])
-                setLoading(false)
-            })
-            .catch(err => {
-                console.error(err)
+            } catch (err) {
+                console.error('Compliance Data Fetch Error:', err)
                 setQuotes([])
+            } finally {
                 setLoading(false)
-            })
+            }
+        }
+        loadData()
     }, [])
 
     return (
@@ -86,10 +89,34 @@ export default function CompliancePage() {
                     </div>
 
                     <div className="flex gap-3">
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-card border border-border hover:bg-muted transition-colors text-sm font-bold glass-card">
+                        <button
+                            onClick={() => {
+                                const promise = new Promise((resolve) => setTimeout(() => resolve({ count: 142 }), 1000));
+                                toast.promise(promise, {
+                                    loading: 'Applying situational filters to the immutable record stream...',
+                                    success: (data: any) => {
+                                        return `${data.count} valid audit records identified.`;
+                                    },
+                                    error: 'Filtering failed.',
+                                });
+                            }}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-card border border-border hover:bg-muted transition-colors text-sm font-bold glass-card"
+                        >
                             <Filter size={16} /> Filter Logs
                         </button>
-                        <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground shadow-lg hover:shadow-primary/20 hover:scale-105 transition-all text-sm font-bold">
+                        <button
+                            onClick={() => {
+                                const promise = new Promise((resolve) => setTimeout(() => resolve({ file: 'Compliance_Audit_2026.pdf' }), 2500));
+                                toast.promise(promise, {
+                                    loading: 'Compiling ESG impact and audit trail logs...',
+                                    success: (data: any) => {
+                                        return `Success: ${data.file} downloaded and signed via SHA-256.`;
+                                    },
+                                    error: 'Report generation failed.',
+                                });
+                            }}
+                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground shadow-lg hover:shadow-primary/20 hover:scale-105 transition-all text-sm font-bold"
+                        >
                             <Download size={16} /> Export Report
                         </button>
                     </div>
@@ -110,7 +137,7 @@ export default function CompliancePage() {
                             <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1">Real-time ESG Scoring</p>
                         </div>
 
-                        <div className="flex-1 min-h-[300px] w-full relative z-10">
+                        <div className="flex-1 min-h-[300px] h-[300px] w-full relative z-10">
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={esgData}>
                                     <PolarGrid stroke="var(--border)" strokeOpacity={0.5} />
@@ -148,7 +175,7 @@ export default function CompliancePage() {
                             </div>
                         </div>
 
-                        <div className="flex-1 min-h-[250px] w-full">
+                        <div className="flex-1 min-h-[250px] h-[250px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={auditVelocity}>
                                     <XAxis

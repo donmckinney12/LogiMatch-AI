@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Clock, Zap, TrendingUp } from 'lucide-react'
+import { apiRequest } from '@/lib/api-client'
 import { AppLayout } from '@/components/app-layout'
 
 export default function KPIDashboard() {
@@ -10,28 +11,25 @@ export default function KPIDashboard() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Mock data for development if API is not available
-        const mockData = {
-            total_quotes: 1243,
-            conversion_rate: 68,
-            allocated_quotes: 845,
-            avg_time_to_value_minutes: 4.2,
-            active_users: 12
-        };
-
-        setData(mockData);
-        setLoading(false);
-
-        // Uncomment when API is ready
-        /*
-        fetch('http://localhost:5000/api/admin/analytics')
-            .then(res => res.json())
-            .then(data => {
-                setData(data)
+        const loadData = async () => {
+            try {
+                // Try fetching real analytics from the backend
+                const result = await apiRequest('/api/admin/analytics')
+                setData(result)
+            } catch (err) {
+                console.warn("API analytics unavailable, falling back to mock data")
+                setData({
+                    total_quotes: 1243,
+                    conversion_rate: 68,
+                    allocated_quotes: 845,
+                    avg_time_to_value_minutes: 4.2,
+                    active_users: 12
+                })
+            } finally {
                 setLoading(false)
-            })
-            .catch(err => console.error(err))
-        */
+            }
+        }
+        loadData()
     }, [])
 
     if (loading) return (

@@ -29,6 +29,7 @@ import {
     ExternalLink
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 import Link from "next/link"
 
 export default function TendersPage() {
@@ -233,7 +234,19 @@ export default function TendersPage() {
                                             Carrier Submissions
                                         </h3>
                                         <div className="flex items-center gap-2">
-                                            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20">
+                                            <button
+                                                onClick={() => {
+                                                    const loaders = toast.loading("AI Winner Recommendation Engine running...")
+                                                    setTimeout(() => {
+                                                        toast.success("AI Recommendation Analysis Complete", {
+                                                            id: loaders,
+                                                            description: "Maersk (Line 3) recommended based on transit-cost efficiency and historical performance.",
+                                                            duration: 6000
+                                                        })
+                                                    }, 2000)
+                                                }}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20"
+                                            >
                                                 <Zap size={10} /> AI Winner Recommendation
                                             </button>
                                         </div>

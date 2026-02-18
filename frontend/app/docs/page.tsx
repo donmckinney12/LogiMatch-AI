@@ -13,20 +13,23 @@ import {
     HelpCircle,
     Zap,
     Cpu,
-    Shield
+    Shield,
+    Blocks
 } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 export default function HelpCenterPage() {
     const [searchQuery, setSearchQuery] = useState("")
+    const router = useRouter()
 
     const popularArticles = [
-        { title: "Introduction to AI Ingestion", description: "Learn how the neural core processes OCR data.", icon: Zap },
-        { title: "Configuring SAP Connectors", description: "Step-by-step guide for ERP integration.", icon: Cpu },
-        { title: "Audit Trail Compliance", description: "How to export records for SOC 2 audits.", icon: Shield },
-        { title: "User Permissions & RBAC", description: "Managing team access levels safely.", icon: FileText }
+        { title: "Technical Quick Start", description: "Deploy LogiMatch into your stack in 15 minutes.", icon: Zap, route: "/docs/quick-start" },
+        { title: "Introduction to AI Ingestion", description: "Learn how the neural core processes OCR data.", icon: Blocks, route: "#" },
+        { title: "Configuring SAP Connectors", description: "Step-by-step guide for ERP integration.", icon: Cpu, route: "#" },
+        { title: "Audit Trail Compliance", description: "How to export records for SOC 2 audits.", icon: Shield, route: "#" }
     ]
 
     return (
@@ -67,43 +70,60 @@ export default function HelpCenterPage() {
                 </div>
 
                 {/* Resource Categories */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="group bg-card border border-border p-10 rounded-[48px] shadow-sm hover:shadow-2xl transition-all duration-500 glass-card space-y-6">
-                        <div className="w-16 h-16 bg-primary/10 text-primary rounded-3xl flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
-                            <Book size={32} />
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div
+                        onClick={() => router.push("/docs/quick-start")}
+                        className="group bg-primary border border-primary/20 p-8 rounded-[40px] shadow-2xl shadow-primary/20 hover:scale-[1.02] transition-all duration-500 cursor-pointer flex flex-col justify-between h-[320px] relative overflow-hidden"
+                    >
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                        <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-white">
+                            <Zap size={28} className="fill-current" />
                         </div>
-                        <div className="space-y-2">
-                            <h3 className="text-2xl font-black text-foreground">Documentation</h3>
-                            <p className="text-muted-foreground font-medium">Deep dives into every feature, API endpoint, and technical spec.</p>
+                        <div className="space-y-2 relative z-10">
+                            <h3 className="text-2xl font-black text-white italic">Quick Start</h3>
+                            <p className="text-white/70 text-sm font-medium">Integration guide for AI/ML engineers & logistics leads.</p>
                         </div>
-                        <Button variant="link" className="p-0 text-primary font-black gap-2 h-auto text-lg underline-offset-8">
-                            Browse Docs <ChevronRight size={18} />
+                        <div className="flex items-center gap-2 text-white font-black uppercase tracking-widest text-[10px]">
+                            Get Started <ChevronRight size={14} />
+                        </div>
+                    </div>
+
+                    <div className="group bg-card border border-border p-8 rounded-[40px] shadow-sm hover:shadow-xl transition-all duration-500 glass-card flex flex-col justify-between h-[320px]">
+                        <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
+                            <Book size={28} />
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Full Docs</h3>
+                            <p className="text-muted-foreground text-xs font-medium">Deep dives into features and API specs.</p>
+                        </div>
+                        <Button variant="link" className="p-0 text-primary font-black gap-2 h-auto text-[10px] uppercase tracking-widest underline-offset-4">
+                            Browse Docs <ChevronRight size={14} />
                         </Button>
                     </div>
 
-                    <div className="group bg-card border border-border p-10 rounded-[48px] shadow-sm hover:shadow-2xl transition-all duration-500 glass-card space-y-6">
-                        <div className="w-16 h-16 bg-blue-500/10 text-blue-500 rounded-3xl flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
-                            <Video size={32} />
+                    <div className="group bg-card border border-border p-8 rounded-[40px] shadow-sm hover:shadow-xl transition-all duration-500 glass-card flex flex-col justify-between h-[320px]">
+                        <div className="w-14 h-14 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
+                            <Video size={28} />
                         </div>
-                        <div className="space-y-2">
-                            <h3 className="text-2xl font-black text-foreground">Video Tutorials</h3>
-                            <p className="text-muted-foreground font-medium">Watch step-by-step masterclasses on workflow automation.</p>
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Tutorials</h3>
+                            <p className="text-muted-foreground text-xs font-medium">Step-by-step masterclasses.</p>
                         </div>
-                        <Button variant="link" className="p-0 text-blue-500 font-black gap-2 h-auto text-lg underline-offset-8">
-                            Watch Now <ChevronRight size={18} />
+                        <Button variant="link" className="p-0 text-blue-500 font-black gap-2 h-auto text-[10px] uppercase tracking-widest underline-offset-4">
+                            Watch Now <ChevronRight size={14} />
                         </Button>
                     </div>
 
-                    <div className="group bg-card border border-border p-10 rounded-[48px] shadow-sm hover:shadow-2xl transition-all duration-500 glass-card space-y-6">
-                        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-500 rounded-3xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
-                            <MessageCircle size={32} />
+                    <div className="group bg-card border border-border p-8 rounded-[40px] shadow-sm hover:shadow-xl transition-all duration-500 glass-card flex flex-col justify-between h-[320px]">
+                        <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all duration-500">
+                            <MessageCircle size={28} />
                         </div>
-                        <div className="space-y-2">
-                            <h3 className="text-2xl font-black text-foreground">Community Hub</h3>
-                            <p className="text-muted-foreground font-medium">Join 5,000+ logistics experts in our professional workspace.</p>
+                        <div className="space-y-1">
+                            <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Community</h3>
+                            <p className="text-muted-foreground text-xs font-medium">Join 5k experts in Discord.</p>
                         </div>
-                        <Button variant="link" className="p-0 text-emerald-500 font-black gap-2 h-auto text-lg underline-offset-8">
-                            Join Discord <ArrowUpRight size={18} />
+                        <Button variant="link" className="p-0 text-emerald-500 font-black gap-2 h-auto text-[10px] uppercase tracking-widest underline-offset-4">
+                            Join Discord <ArrowUpRight size={14} />
                         </Button>
                     </div>
                 </div>
@@ -119,6 +139,7 @@ export default function HelpCenterPage() {
                         {popularArticles.map((article, i) => (
                             <button
                                 key={i}
+                                onClick={() => article.route !== "#" && router.push(article.route)}
                                 className="flex items-center gap-6 p-8 bg-card border border-border rounded-[32px] hover:border-primary/50 text-left transition-all duration-300 group shadow-sm hover:shadow-xl glass-card"
                             >
                                 <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300 shrink-0 border border-border">

@@ -5,6 +5,8 @@ import { CheckCircle, Loader2, Truck } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppLayout } from '@/components/app-layout'
 
+import { apiRequest } from '@/lib/api-client'
+
 export default function VendorOnboardingPage() {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
@@ -21,14 +23,10 @@ export default function VendorOnboardingPage() {
         setError(null)
 
         try {
-            const res = await fetch('http://localhost:5000/api/vendors/onboarding', {
+            await apiRequest('/api/vendors/onboarding', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             })
-
-            const data = await res.json()
-            if (!res.ok) throw new Error(data.error || 'Submission failed')
 
             setSubmitted(true)
         } catch (err: any) {

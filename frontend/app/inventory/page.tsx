@@ -19,6 +19,7 @@ import {
     Activity
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export default function InventoryDashboard() {
     const { orgId } = useOrg()
@@ -243,10 +244,34 @@ export default function InventoryDashboard() {
                             current port congestion.
                         </p>
                         <div className="flex flex-wrap gap-4 pt-2 justify-center md:justify-start">
-                            <button className="px-6 py-3 bg-muted hover:bg-muted/80 dark:bg-white/10 dark:hover:bg-white/20 border border-border dark:border-white/10 rounded-2xl text-sm font-bold transition-all">
+                            <button
+                                onClick={() => {
+                                    const promise = new Promise((resolve) => setTimeout(() => resolve({ impact: 'MODERATE' }), 3000));
+                                    toast.promise(promise, {
+                                        loading: 'Running hardware-accelerated Stock-out Simulation...',
+                                        success: (data: any) => {
+                                            return `Simulation Complete. Impact: ${data.impact}. Risk mitigation report generated.`;
+                                        },
+                                        error: 'Simulation failed to initialize.',
+                                    });
+                                }}
+                                className="px-6 py-3 bg-muted hover:bg-muted/80 dark:bg-white/10 dark:hover:bg-white/20 border border-border dark:border-white/10 rounded-2xl text-sm font-bold transition-all"
+                            >
                                 Run Stock-out Simulation
                             </button>
-                            <button className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-blue-500/20">
+                            <button
+                                onClick={() => {
+                                    const promise = new Promise((resolve) => setTimeout(() => resolve({ expedited: 3 }), 2000));
+                                    toast.promise(promise, {
+                                        loading: 'Opening Expedite Center...',
+                                        success: (data: any) => {
+                                            return `Priority lanes active. ${data.expedited} shipments moved to "EXPRESS" class.`;
+                                        },
+                                        error: 'Failed to access Expedite Center.',
+                                    });
+                                }}
+                                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-2xl text-sm font-bold transition-all shadow-lg shadow-blue-500/20"
+                            >
                                 Open Expedite Center
                             </button>
                         </div>

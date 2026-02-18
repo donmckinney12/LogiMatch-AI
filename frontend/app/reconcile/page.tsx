@@ -23,8 +23,11 @@ import {
     Zap
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useOrg } from "@/context/org-context"
+import { apiRequest } from "@/lib/api-client"
 
 export default function ReconcilePage() {
+    const { orgId } = useOrg()
     const [invoices, setInvoices] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
     const [uploading, setUploading] = useState(false)
@@ -33,15 +36,14 @@ export default function ReconcilePage() {
 
     const fetchMatches = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/reconcile/matches')
-            const data = await res.json()
+            const data = await apiRequest('/api/reconcile/matches', {}, orgId)
             setInvoices(data)
         } catch (err) {
             console.error("Match Fetch Error:", err)
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [orgId])
 
     useEffect(() => {
         fetchMatches()
@@ -56,14 +58,11 @@ export default function ReconcilePage() {
         formData.append('user_id', 'PilotUser_01')
 
         try {
-            const res = await fetch('http://localhost:5000/api/reconcile/upload', {
+            await apiRequest('/api/reconcile/upload', {
                 method: 'POST',
                 body: formData
-            })
-            const data = await res.json()
-            if (res.ok) {
-                fetchMatches()
-            }
+            }, orgId)
+            fetchMatches()
         } catch (err) {
             console.error("Upload Error:", err)
         } finally {
@@ -73,14 +72,12 @@ export default function ReconcilePage() {
 
     const handleAction = async (invoiceId: number, action: 'APPROVE' | 'DISPUTE') => {
         try {
-            const res = await fetch('http://localhost:5000/api/reconcile/action', {
+            await apiRequest('/api/reconcile/action', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ invoice_id: invoiceId, action })
-            })
-            if (res.ok) {
-                fetchMatches()
-            }
+            }, orgId)
+            fetchMatches()
         } catch (err) {
             console.error("Action Error:", err)
         }

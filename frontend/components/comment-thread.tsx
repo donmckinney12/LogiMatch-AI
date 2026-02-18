@@ -26,6 +26,8 @@ interface CommentThreadProps {
     isOpen: boolean
 }
 
+import { apiRequest } from "@/lib/api-client"
+
 export function CommentThread({ quoteId, filename, onClose, isOpen }: CommentThreadProps) {
     const [comments, setComments] = useState<Comment[]>([])
     const [newComment, setNewComment] = useState("")
@@ -41,12 +43,7 @@ export function CommentThread({ quoteId, filename, onClose, isOpen }: CommentThr
     const fetchComments = async () => {
         setLoading(true)
         try {
-            const res = await fetch(`http://localhost:5000/api/quotes/${quoteId}/comments`, {
-                headers: {
-                    'X-Organization-ID': 'org_demo_123' // Mock for Phase 12
-                }
-            })
-            const data = await res.json()
+            const data = await apiRequest(`/api/quotes/${quoteId}/comments`)
             setComments(data)
         } catch (err) {
             console.error("Failed to fetch comments", err)
@@ -61,22 +58,15 @@ export function CommentThread({ quoteId, filename, onClose, isOpen }: CommentThr
 
         setSubmitting(true)
         try {
-            const res = await fetch(`http://localhost:5000/api/quotes/${quoteId}/comments`, {
+            const added = await apiRequest(`/api/quotes/${quoteId}/comments`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Organization-ID': 'org_demo_123'
-                },
                 body: JSON.stringify({
                     content: newComment,
                     user_id: 'PilotUser_01' // Mock
                 })
             })
-            if (res.ok) {
-                const added = await res.json()
-                setComments([...comments, added])
-                setNewComment("")
-            }
+            setComments([...comments, added])
+            setNewComment("")
         } catch (err) {
             console.error("Failed to post comment", err)
         } finally {

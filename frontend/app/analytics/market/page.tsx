@@ -2,26 +2,30 @@
 
 import { useEffect, useState } from "react"
 import { AppLayout } from "@/components/app-layout"
+import { useOrg } from "@/context/org-context"
+import { apiRequest } from "@/lib/api-client"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts"
 import { TrendingUp, Info, AlertTriangle, Lightbulb, ArrowUpRight, Gauge } from "lucide-react"
 
 export default function MarketIntelligencePage() {
+    const { orgId } = useOrg()
     const [marketData, setMarketData] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/analytics/market')
-            .then(res => res.json())
-            .then(data => {
+        const loadData = async () => {
+            try {
+                const data = await apiRequest('/api/analytics/market', {}, orgId)
                 setMarketData(data)
-                setLoading(false)
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error("Market fetch failed", err)
+            } finally {
                 setLoading(false)
-            })
-    }, [])
+            }
+        }
+        loadData()
+    }, [orgId])
 
     if (loading) return (
         <AppLayout>

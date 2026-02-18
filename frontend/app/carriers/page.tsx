@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useEffect, useState } from 'react'
 import { CheckCircle, AlertCircle, Clock } from 'lucide-react'
 
+import { apiRequest } from '@/lib/api-client'
 import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 
@@ -13,10 +14,15 @@ export default function CarriersPage() {
     const [activeTab, setActiveTab] = useState<'directory' | 'pending'>('directory')
 
     useEffect(() => {
-        fetch('http://localhost:5000/api/carriers')
-            .then(res => res.json())
-            .then(setCarriers)
-            .catch(err => console.error("Failed to load carriers", err))
+        const loadCarriers = async () => {
+            try {
+                const data = await apiRequest('/api/carriers')
+                setCarriers(data)
+            } catch (err) {
+                console.error("Failed to load carriers", err)
+            }
+        }
+        loadCarriers()
     }, [])
 
     const pendingCarriers = carriers.filter(c => c.onboarding_status === 'PENDING')

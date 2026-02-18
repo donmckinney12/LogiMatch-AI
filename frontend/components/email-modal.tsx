@@ -18,6 +18,8 @@ interface EmailModalProps {
     data: any
 }
 
+import { apiRequest, getApiUrl } from '@/lib/api-client'
+
 export function EmailModal({ isOpen, onClose, data }: EmailModalProps) {
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState<{ subject: string; body: string } | null>(null)
@@ -40,13 +42,10 @@ export function EmailModal({ isOpen, onClose, data }: EmailModalProps) {
         setLoading(true)
         setError(null)
         try {
-            const response = await fetch('http://localhost:5000/api/generate-email', {
+            const result = await apiRequest('/api/generate-email', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             })
-            const result = await response.json()
-            if (!response.ok) throw new Error(result.error || 'Failed to generate email')
             setEmail(result)
         } catch (err: any) {
             setError(err.message)
@@ -58,9 +57,10 @@ export function EmailModal({ isOpen, onClose, data }: EmailModalProps) {
     const handleDownloadPDF = async () => {
         if (!data) return
         try {
-            const res = await fetch("http://localhost:5000/api/generate-booking-pdf", {
+            const baseUrl = getApiUrl()
+            const res = await fetch(`${baseUrl}/api/generate-booking-pdf`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "X-Organization-ID": "org_demo_123" },
                 body: JSON.stringify(data)
             })
             if (res.ok) {

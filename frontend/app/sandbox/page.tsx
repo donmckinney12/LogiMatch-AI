@@ -39,6 +39,8 @@ import {
     Cell
 } from 'recharts'
 
+import { apiRequest } from "@/lib/api-client"
+
 export default function SandboxPage() {
     const [baseline, setBaseline] = useState<any>(null)
     const [simulation, setSimulation] = useState<any>(null)
@@ -53,8 +55,7 @@ export default function SandboxPage() {
 
     const fetchInitialData = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/simulation/baseline')
-            const data = await res.json()
+            const data = await apiRequest('/api/simulation/baseline')
             setBaseline(data)
 
             // Auto-run default scenario
@@ -71,12 +72,10 @@ export default function SandboxPage() {
         setRunning(true)
         setActiveScenario(scenario)
         try {
-            const res = await fetch('http://localhost:5000/api/simulation/run', {
+            const data = await apiRequest('/api/simulation/run', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ scenario, variable: 0.2 }) // 20% adjustment
             })
-            const data = await res.json()
             setSimulation(data)
         } catch (err) {
             console.error(err)
@@ -87,12 +86,10 @@ export default function SandboxPage() {
 
     const fetchOptimizations = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/simulation/scenario', {
+            const data = await apiRequest('/api/simulation/scenario', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ priority: 'COST' })
             })
-            const data = await res.json()
             setOptimizations(data)
         } catch (err) {
             console.error(err)

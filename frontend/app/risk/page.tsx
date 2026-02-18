@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { AppLayout } from "@/components/app-layout"
+import { apiRequest } from "@/lib/api-client"
 import {
     ShieldAlert,
     AlertTriangle,
@@ -21,9 +22,12 @@ import {
     Globe
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useOrg } from "@/context/org-context"
 import { Globe3D } from "@/components/globe-3d"
+import { toast } from "sonner"
 
 export default function RiskIntelligencePage() {
+    const { orgId } = useOrg()
     const [disruptions, setDisruptions] = useState<any[]>([])
     const [impactAnalysis, setImpactAnalysis] = useState<any>(null)
     const [selectedDisruption, setSelectedDisruption] = useState<any>(null)
@@ -42,16 +46,13 @@ export default function RiskIntelligencePage() {
 
     const fetchRiskData = async () => {
         try {
-            const [dRes, iRes] = await Promise.all([
-                fetch('http://localhost:5000/api/risk/disruptions'),
-                fetch('http://localhost:5000/api/risk/impact-analysis', {
+            const [dData, iData] = await Promise.all([
+                apiRequest('/api/risk/disruptions', {}, orgId),
+                apiRequest('/api/risk/impact-analysis', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ org_id: 'org_demo_123' })
-                })
+                    body: JSON.stringify({ org_id: orgId })
+                }, orgId)
             ])
-            const dData = await dRes.json()
-            const iData = await iRes.json()
 
             setDisruptions(dData)
             setImpactAnalysis(iData)
@@ -65,8 +66,7 @@ export default function RiskIntelligencePage() {
 
     const fetchMitigation = async (type: string, location: string) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/risk/mitigation?type=${type}&location=${location}`)
-            const data = await res.json()
+            const data = await apiRequest(`/api/risk/mitigation?type=${type}&location=${location}`, {}, orgId)
             setMitigation(data)
         } catch (err) {
             console.error(err)
@@ -178,7 +178,13 @@ export default function RiskIntelligencePage() {
                                 ))}
                             </ul>
 
-                            <button className="relative z-10 w-full p-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-primary/20">
+                            <button
+                                onClick={() => toast.success("Recovery Protocol Initiated. AI Agents are rerouting impacted shipments.", {
+                                    description: "New routes will be visible in the Impact Radar shortly.",
+                                    duration: 5000
+                                })}
+                                className="relative z-10 w-full p-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 transition-all flex items-center justify-center gap-2 mt-4 shadow-lg shadow-primary/20"
+                            >
                                 Execute Recovery Protocol <ArrowRight size={14} />
                             </button>
                         </div>

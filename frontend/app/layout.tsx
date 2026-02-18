@@ -6,6 +6,7 @@ import { OrgProvider } from "@/context/org-context";
 import { SubscriptionProvider } from "@/context/subscription-context";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { ZohoSalesIQ } from "@/components/zoho-salesiq";
 
 const sourceSans = Source_Sans_3({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 {children}
+                <ZohoSalesIQ />
                 <Toaster />
               </ThemeProvider>
             </body>

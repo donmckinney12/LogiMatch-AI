@@ -1,9 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { cn } from "@/lib/utils"
 import { AppLayout } from "@/components/app-layout"
-import { Plus, Trash2, Check, X, Mail, Zap, Shield, Lock, Scale, FileText, AlertCircle } from "lucide-react"
+import { Plus, Trash2, Check, X, Mail, Zap, Shield, Lock, Scale, FileText, AlertCircle, CreditCard, ArrowRight, Sun, Moon, Monitor } from "lucide-react"
 import { useUser } from "@clerk/nextjs"
+import { useTheme } from "next-themes"
+import { apiRequest } from "@/lib/api-client"
 import { Button } from "@/components/ui/button"
 
 type Surcharge = {
@@ -23,9 +26,10 @@ type ExchangeRate = {
 
 export default function SettingsPage() {
     const { user } = useUser()
+    const { theme, setTheme } = useTheme()
     const [surcharges, setSurcharges] = useState<Surcharge[]>([])
     const [rates, setRates] = useState<ExchangeRate[]>([])
-    const [activeTab, setActiveTab] = useState<'surcharges' | 'rates' | 'email' | 'governance'>('surcharges')
+    const [activeTab, setActiveTab] = useState<'surcharges' | 'rates' | 'email' | 'governance' | 'billing' | 'appearance'>('surcharges')
     const [isTestingInbound, setIsTestingInbound] = useState(false)
 
     const [isAddingSurcharge, setIsAddingSurcharge] = useState(false)
@@ -41,10 +45,8 @@ export default function SettingsPage() {
 
     const fetchSurcharges = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/surcharges")
-            if (res.ok) {
-                setSurcharges(await res.json())
-            }
+            const data = await apiRequest("/api/surcharges")
+            setSurcharges(data)
         } catch (e) {
             console.error("Failed to fetch surcharges", e)
         }
@@ -52,8 +54,8 @@ export default function SettingsPage() {
 
     const fetchRates = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/rates")
-            if (res.ok) setRates(await res.json())
+            const data = await apiRequest("/api/rates")
+            setRates(data)
         } catch (e) {
             console.error("Failed to fetch rates", e)
         }
@@ -61,16 +63,13 @@ export default function SettingsPage() {
 
     const handleAddSurcharge = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/surcharges", {
+            await apiRequest("/api/surcharges", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newSurcharge)
             })
-            if (res.ok) {
-                await fetchSurcharges()
-                setIsAddingSurcharge(false)
-                setNewSurcharge({ raw_name: "", normalized_name: "", category: "General", is_approved: true })
-            }
+            await fetchSurcharges()
+            setIsAddingSurcharge(false)
+            setNewSurcharge({ raw_name: "", normalized_name: "", category: "General", is_approved: true })
         } catch (e) {
             console.error("Failed to add surcharge", e)
         }
@@ -78,16 +77,13 @@ export default function SettingsPage() {
 
     const handleAddRate = async () => {
         try {
-            const res = await fetch("http://localhost:5000/api/rates", {
+            await apiRequest("/api/rates", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newRate)
             })
-            if (res.ok) {
-                await fetchRates()
-                setIsAddingRate(false)
-                setNewRate({ currency_code: "", rate_to_usd: "" })
-            }
+            await fetchRates()
+            setIsAddingRate(false)
+            setNewRate({ currency_code: "", rate_to_usd: "" })
         } catch (e) {
             console.error("Failed to add rate", e)
         }
@@ -110,6 +106,12 @@ export default function SettingsPage() {
                         Surcharge Library
                     </button>
                     <button
+                        onClick={() => setActiveTab('billing')}
+                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'billing' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Billing & Usage
+                    </button>
+                    <button
                         onClick={() => setActiveTab('rates')}
                         className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'rates' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
@@ -120,6 +122,12 @@ export default function SettingsPage() {
                         className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'email' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                     >
                         Inbound Email
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('appearance')}
+                        className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'appearance' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                    >
+                        Appearance
                     </button>
                     <button
                         onClick={() => setActiveTab('governance')}
@@ -228,6 +236,26 @@ export default function SettingsPage() {
                             </tbody>
                         </table>
                     </div>
+                ) : activeTab === 'billing' ? (
+                    <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden glass-card">
+                        <div className="p-12 text-center space-y-6">
+                            <div className="mx-auto w-20 h-20 bg-primary/10 text-primary rounded-[24px] flex items-center justify-center shadow-inner">
+                                <CreditCard size={40} />
+                            </div>
+                            <div className="max-w-md mx-auto space-y-2">
+                                <h2 className="text-2xl font-black text-foreground uppercase tracking-tight italic">Subscription & Usage</h2>
+                                <p className="text-muted-foreground font-medium">
+                                    Manage your enterprise normalization credits, view invoices, and scale your neural capacity.
+                                </p>
+                            </div>
+                            <Button
+                                className="bg-primary hover:bg-primary/90 px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest flex items-center gap-2 mx-auto"
+                                onClick={() => window.location.href = '/settings/billing'}
+                            >
+                                Manage Credits & Billing <ArrowRight size={16} />
+                            </Button>
+                        </div>
+                    </div>
                 ) : activeTab === 'rates' ? (
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden glass-card">
                         <div className="p-12 text-center text-muted-foreground italic">
@@ -267,9 +295,8 @@ export default function SettingsPage() {
                                     onClick={async () => {
                                         setIsTestingInbound(true)
                                         try {
-                                            const res = await fetch("http://localhost:5000/api/inbound/email-webhook", {
+                                            await apiRequest("/api/inbound/email-webhook", {
                                                 method: "POST",
-                                                headers: { "Content-Type": "application/json" },
                                                 body: JSON.stringify({
                                                     from: user?.primaryEmailAddress?.emailAddress || "pilot@logistics.com",
                                                     subject: "Fwd: Freight Quote - MSC",
@@ -282,8 +309,7 @@ export default function SettingsPage() {
                                                     ]
                                                 })
                                             })
-                                            if (res.ok) alert("Mock Email Ingested! Check your Dashboard.")
-                                            else alert("Test failed.")
+                                            alert("Mock Email Ingested! Check your Dashboard.")
                                         } catch (e) {
                                             console.error(e)
                                         } finally {
@@ -297,54 +323,71 @@ export default function SettingsPage() {
                             </div>
                         </div>
                     </div>
-                ) : (
+                ) : activeTab === 'appearance' ? (
                     <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden glass-card">
                         <div className="p-8 space-y-8">
-                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 p-8 rounded-[32px] bg-primary/5 border border-primary/10">
-                                <div className="space-y-4">
-                                    <div className="flex items-center gap-2 text-primary">
-                                        <Shield size={24} />
-                                        <h2 className="text-xl font-bold tracking-tight">Legal & Governance Hub</h2>
-                                    </div>
-                                    <p className="text-muted-foreground max-w-xl text-sm leading-relaxed">
-                                        Review our commitment to data security, privacy, and the terms governing the use of the LogiMatch AI neural core.
-                                        Enterprise users are subject to additional Master Service Agreements (MSA).
-                                    </p>
-                                    <div className="flex flex-wrap gap-3">
-                                        {['GDPR Compliant', 'SOC2 Type II', 'CCPA Support', 'ISO 27001'].map(tag => (
-                                            <span key={tag} className="px-3 py-1 bg-background border border-border rounded-full text-[10px] font-black uppercase text-muted-foreground">
-                                                {tag}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                                <Button
-                                    className="bg-primary hover:bg-primary/90 px-8 py-6 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-primary/20"
-                                    onClick={() => window.location.href = '/settings/legal'}
-                                >
-                                    Access Full Legal Center
-                                </Button>
+                            <div>
+                                <h2 className="text-xl font-bold text-foreground italic uppercase tracking-tight">Appearance</h2>
+                                <p className="text-sm text-muted-foreground">Customize how LogiMatch AI looks on your screen.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {[
-                                    { title: "Privacy Policy", desc: "How we secure your sensitive logistics telemetry.", icon: Lock, link: "/settings/legal" },
-                                    { title: "Terms of Service", desc: "Agreement on platform usage and limitations.", icon: Scale, link: "/settings/legal" },
-                                    { title: "Refund Policy", desc: "Clarification on custom-quoted 'Enterprise' billing.", icon: FileText, link: "/settings/legal" },
-                                    { title: "AI Accuracy Disclaimer", desc: "Neural model probability and limit of liability.", icon: AlertCircle, link: "/settings/legal" },
-                                ].map((doc, i) => (
-                                    <div key={i} className="p-6 rounded-2xl border border-border hover:border-primary/40 transition-all group flex items-start gap-4">
-                                        <div className="p-3 rounded-xl bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary transition-colors">
-                                            <doc.icon size={20} />
+                                    { id: 'light', name: 'Light Mode', icon: Sun, desc: 'Clean and bright' },
+                                    { id: 'dark', name: 'Dark Mode', icon: Moon, desc: 'Kind to your eyes' },
+                                    { id: 'system', name: 'System', icon: Monitor, desc: 'Dynamic matching' },
+                                ].map((mode) => (
+                                    <button
+                                        key={mode.id}
+                                        onClick={() => setTheme(mode.id)}
+                                        className={cn(
+                                            "p-6 rounded-2xl border transition-all text-left flex flex-col gap-4 group",
+                                            theme === mode.id
+                                                ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                                : "border-border hover:border-primary/40 hover:bg-muted"
+                                        )}
+                                    >
+                                        <div className={cn(
+                                            "p-3 rounded-xl w-fit transition-colors",
+                                            theme === mode.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground group-hover:text-primary"
+                                        )}>
+                                            <mode.icon size={20} />
                                         </div>
-                                        <div className="space-y-1">
-                                            <h3 className="font-bold text-foreground group-hover:text-primary transition-colors">{doc.title}</h3>
-                                            <p className="text-xs text-muted-foreground leading-relaxed">{doc.desc}</p>
+                                        <div>
+                                            <h3 className="font-bold text-foreground uppercase tracking-tight text-xs">{mode.name}</h3>
+                                            <p className="text-[10px] text-muted-foreground font-medium">{mode.desc}</p>
                                         </div>
-                                    </div>
+                                        {theme === mode.id && (
+                                            <div className="ml-auto mt-auto">
+                                                <div className="bg-primary text-primary-foreground p-1 rounded-full">
+                                                    <Check size={12} />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </button>
                                 ))}
                             </div>
+
+                            <div className="p-6 rounded-2xl bg-muted/30 border border-border/40">
+                                <div className="flex items-start gap-4">
+                                    <div className="p-2 bg-blue-500/10 text-blue-500 rounded-lg">
+                                        <AlertCircle size={18} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <h4 className="text-sm font-bold text-foreground">Pro-Tip: Glassmorphism</h4>
+                                        <p className="text-xs text-muted-foreground leading-relaxed">
+                                            LogiMatch AI uses dynamic glassmorphism. Dark mode highlights the depth of neural layers, while Light mode emphasizes the clarity of your supply chain manifesting data.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                ) : (
+                    // Default or fallback content if none of the above match
+                    // This case should ideally not be reached if all tabs are handled
+                    <div className="p-12 text-center text-muted-foreground italic">
+                        Select a tab to view settings.
                     </div>
                 )}
             </div>

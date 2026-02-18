@@ -30,6 +30,7 @@ import {
     Bar,
     Cell
 } from "recharts"
+import { toast } from "sonner"
 
 const healthData = [
     { time: '00:00', health: 98 },
@@ -190,7 +191,19 @@ export default function WarRoomPage() {
                             <p className="text-xs text-muted-foreground font-medium leading-relaxed">
                                 AI has identified a lane reconfiguration that could yield **$142K/mo** in savings across the LATAM corridor.
                             </p>
-                            <button className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+                            <button
+                                onClick={() => {
+                                    const promise = new Promise((resolve) => setTimeout(() => resolve({ name: 'LATAM Optimization' }), 2000));
+                                    toast.promise(promise, {
+                                        loading: 'Analyzing carrier networks and lane variance...',
+                                        success: (data: any) => {
+                                            return `Success: ${data.name} active. $142K/mo in savings identified.`;
+                                        },
+                                        error: 'Optimization engine timed out.',
+                                    });
+                                }}
+                                className="w-full py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                            >
                                 Launch Optimization Solver <ArrowUpRight size={14} />
                             </button>
                         </div>
@@ -232,10 +245,30 @@ export default function WarRoomPage() {
                                 Carrier **Apex Global** has submitted 14 invoices with a variance 12% above quoted rates. Total potential overcharge: **$84,200**.
                             </p>
                             <div className="flex flex-wrap gap-4">
-                                <button className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 shadow-xl shadow-primary/30 transition-all active:scale-95">
+                                <button
+                                    onClick={() => {
+                                        const promise = new Promise((resolve) => setTimeout(() => resolve({ caseId: 'V-882' }), 2500));
+                                        toast.promise(promise, {
+                                            loading: 'Filing variance dispute with Apex Global...',
+                                            success: (data: any) => {
+                                                return `Case ${data.caseId} Created. Carrier notified for rate reconciliation.`;
+                                            },
+                                            error: 'Failed to initiate conflict resolution.',
+                                        });
+                                    }}
+                                    className="px-8 py-4 bg-primary text-primary-foreground rounded-2xl font-black text-xs uppercase hover:opacity-90 shadow-xl shadow-primary/30 transition-all active:scale-95"
+                                >
                                     Initiate Conflict Resolution
                                 </button>
-                                <button className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-xs uppercase hover:bg-white/10 transition-all">
+                                <button
+                                    onClick={() => {
+                                        toast.info("Preparing audit trail...", {
+                                            description: "Compiling variance logs and rate references."
+                                        })
+                                        setTimeout(() => toast.success("Download ready"), 2000)
+                                    }}
+                                    className="px-8 py-4 bg-white/5 border border-white/10 rounded-2xl font-black text-xs uppercase hover:bg-white/10 transition-all"
+                                >
                                     Download Audit Trail
                                 </button>
                             </div>

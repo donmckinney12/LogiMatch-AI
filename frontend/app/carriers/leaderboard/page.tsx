@@ -15,6 +15,8 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+import { apiRequest } from "@/lib/api-client"
+
 interface Carrier {
     id: number
     name: string
@@ -36,8 +38,7 @@ export default function CarrierLeaderboard() {
 
     const fetchCarriers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/carriers')
-            const data = await res.json()
+            const data = await apiRequest('/api/carriers')
             setCarriers(data.sort((a: Carrier, b: Carrier) => b.reliability_score - a.reliability_score))
         } catch (err) {
             console.error(err)

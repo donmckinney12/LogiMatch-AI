@@ -5,6 +5,8 @@ import { Plus, Trash2, Send, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AppLayout } from '@/components/app-layout'
 
+import { apiRequest } from '@/lib/api-client'
+
 export default function DirectQuotePage() {
     const [loading, setLoading] = useState(false)
     const [submitted, setSubmitted] = useState(false)
@@ -53,13 +55,11 @@ export default function DirectQuotePage() {
                 }))
             }
 
-            const res = await fetch('http://localhost:5000/api/quotes/direct', {
+            await apiRequest('/api/quotes/direct', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             })
 
-            if (!res.ok) throw new Error("Submission failed")
             setSubmitted(true)
         } catch (err) {
             alert("Failed to submit quote")

@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react'
 import { ArrowLeft, ShieldCheck, MapPin, Phone, Mail, Award, TrendingUp, AlertTriangle } from 'lucide-react'
 import { cn } from "@/lib/utils"
 
+import { apiRequest } from '@/lib/api-client'
+
 export default function CarrierDetailsPage() {
     const router = useRouter()
     const params = useParams()
@@ -16,18 +18,18 @@ export default function CarrierDetailsPage() {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        // Simulating fetch
-        fetch('http://localhost:5000/api/carriers')
-            .then(res => res.json())
-            .then(data => {
+        const loadData = async () => {
+            try {
+                const data = await apiRequest('/api/carriers')
                 const found = data.find((c: any) => c.id.toString() === id)
                 setCarrier(found)
-                setLoading(false)
-            })
-            .catch(err => {
+            } catch (err) {
                 console.error(err)
+            } finally {
                 setLoading(false)
-            })
+            }
+        }
+        loadData()
     }, [id])
 
     if (loading) {

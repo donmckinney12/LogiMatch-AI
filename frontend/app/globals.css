@@ -48,47 +48,62 @@
 }
 
 :root {
-  /* Very light gray background instead of pure white */
-  /* Dark gray text instead of black #171717 */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  /* Softer dark gray for card text */
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  /* Medium gray instead of very dark */
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  /* Light blue accent instead of gray */
-  --accent-foreground: oklch(0.205 0 0);
+  /* Ghost White & Royal Blue Aesthetic */
+  --background: #F8F8FF;
+  /* Ghost White */
+  --foreground: #1D2433;
+  /* Deep Navy-Charcoal */
+  --card: #FFFFFF;
+  --card-foreground: #1D2433;
+  --popover: #FFFFFF;
+  --popover-foreground: #1D2433;
+
+  /* Primary Royal Blue Core */
+  --primary: #4169E1;
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #F0F4FF;
+  /* Soft Blue tint */
+  --secondary-foreground: #4169E1;
+
+  --muted: #F0F4FF;
+  --muted-foreground: #64748B;
+  /* Slate-500 */
+
+  /* Vibrant Blue Accents */
+  --accent: #3B82F6;
+  --accent-foreground: #FFFFFF;
+
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: #ffffff;
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
 
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.4);
+  --border: #E8EDFF;
+  --input: #E8EDFF;
+  --ring: #4169E1;
+
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.6);
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+
+  --chart-1: #4169E1;
+  /* Royal Blue */
+  --chart-2: #3B82F6;
+  /* Blue */
+  --chart-3: #6366F1;
+  /* Indigo */
+  --chart-4: #8B5CF6;
+  /* Purple */
+  --chart-5: #0F172A;
+  /* Navy */
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1D2433;
+  --sidebar-primary: #4169E1;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F0F4FF;
+  --sidebar-accent-foreground: #4169E1;
+  --sidebar-border: #E8EDFF;
+  --sidebar-ring: #4169E1;
 }
 
 .dark {
@@ -167,12 +182,36 @@
 }
 
 .bg-mesh {
-  background: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(at 0% 0%, rgba(65, 105, 225, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(65, 105, 225, 0.08) 0px, transparent 50%);
   background-size: 140% 140%;
-  animation: mesh 15s ease infinite;
+  animation: mesh 12s ease infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+.dark .bg-mesh {
+  background: radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.25) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(59, 130, 246, 0.15) 0px, transparent 50%);
+}
+
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(65, 105, 225, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(65, 105, 225, 0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+  pointer-events: none;
 }
 
 body {
@@ -188,9 +227,22 @@ body {
 
 /* Glassmorphism Utilities */
 .glass-card {
-  @apply backdrop-blur-md;
-  background-color: var(--glass-bg);
+  @apply backdrop-blur-2xl;
+  background: linear-gradient(135deg, var(--glass-bg), rgba(255, 255, 255, 0.1));
   border: 1px solid var(--glass-border);
+  box-shadow:
+    0 20px 50px 0 rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.dark .glass-card {
+  background: linear-gradient(135deg, rgba(21, 25, 33, 0.8), rgba(21, 25, 33, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 20px 50px 0 rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 /* Typography Overhaul */

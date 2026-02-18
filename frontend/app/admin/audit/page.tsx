@@ -25,6 +25,8 @@ interface AuditLog {
     timestamp: string
 }
 
+import { apiRequest } from "@/lib/api-client"
+
 export default function AuditExplorerPage() {
     const [logs, setLogs] = useState<AuditLog[]>([])
     const [loading, setLoading] = useState(true)
@@ -34,11 +36,10 @@ export default function AuditExplorerPage() {
         const fetchLogs = async () => {
             setLoading(true)
             try {
-                const url = currentCategory === "ALL"
-                    ? 'http://localhost:5000/api/audit-logs'
-                    : `http://localhost:5000/api/audit-logs?category=${currentCategory}`
-                const res = await fetch(url)
-                const data = await res.json()
+                const endpoint = currentCategory === "ALL"
+                    ? '/api/audit-logs'
+                    : `/api/audit-logs?category=${currentCategory}`
+                const data = await apiRequest(endpoint)
                 setLogs(data)
             } catch (err) {
                 console.error("Failed to fetch audit logs", err)

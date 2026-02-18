@@ -12,6 +12,8 @@ import { useUser } from '@clerk/nextjs'
 import { Loader2, CheckCircle2, AlertCircle, Mail, MessageSquare, Bug, Lightbulb } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { apiRequest } from '@/lib/api-client'
+
 export default function ContactPage() {
     const { user } = useUser()
     const [loading, setLoading] = useState(false)
@@ -29,9 +31,8 @@ export default function ContactPage() {
         setLoading(true)
         try {
             // Reusing the existing feedback endpoint, mimicking a "ticket" creation
-            const res = await fetch('http://localhost:5000/api/feedback', {
+            await apiRequest('/api/feedback', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     user_id: user?.id || 'Anonymous',
                     category,
@@ -40,15 +41,11 @@ export default function ContactPage() {
                 })
             })
 
-            if (res.ok) {
-                setSuccess(true)
-                toast.success("Support ticket created successfully!")
-                setSubject("")
-                setMessage("")
-                setCategory("GENERAL")
-            } else {
-                throw new Error("Failed to submit")
-            }
+            setSuccess(true)
+            toast.success("Support ticket created successfully!")
+            setSubject("")
+            setMessage("")
+            setCategory("GENERAL")
         } catch (err) {
             console.error(err)
             toast.error("Failed to submit ticket. Please try again.")

@@ -33,6 +33,8 @@ const volumeTrendData = [
     { month: 'Jun', volume: 750 },
 ];
 
+import { apiRequest } from "@/lib/api-client"
+
 export default function CarrierBidPortal({ params }: { params: Promise<{ token: string }> }) {
     const { token } = use(params)
     const [tender, setTender] = useState<any>(null)
@@ -50,8 +52,7 @@ export default function CarrierBidPortal({ params }: { params: Promise<{ token: 
 
     const fetchTender = useCallback(async () => {
         try {
-            const res = await fetch(`http://localhost:5000/api/tenders/${token}`)
-            const data = await res.json()
+            const data = await apiRequest(`/api/tenders/${token}`)
             setTender(data)
         } catch (err) {
             console.error(err)
@@ -62,8 +63,7 @@ export default function CarrierBidPortal({ params }: { params: Promise<{ token: 
 
     const fetchCarriers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/carriers')
-            const data = await res.json()
+            const data = await apiRequest('/api/carriers')
             setCarriers(data)
         } catch (err) {
             console.error(err)
@@ -78,9 +78,8 @@ export default function CarrierBidPortal({ params }: { params: Promise<{ token: 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         try {
-            const res = await fetch('http://localhost:5000/api/tenders/bids/submit', {
+            await apiRequest('/api/tenders/bids/submit', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     tender_id: tender.id,
                     ...formData,
@@ -88,9 +87,7 @@ export default function CarrierBidPortal({ params }: { params: Promise<{ token: 
                     transit_time_days: parseInt(formData.transit_time_days)
                 })
             })
-            if (res.ok) {
-                setSubmitted(true)
-            }
+            setSubmitted(true)
         } catch (err) {
             console.error(err)
         }
