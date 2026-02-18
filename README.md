@@ -7,6 +7,16 @@
 
 ---
 
+## 🚀 Latest Enterprise Updates (v5.0)
+
+We've recently transformed the platform to a unified **Mission Control** architecture:
+- **Home / Portal Navigation**: A clean, centralized entry point for all Logistics Intelligence modules.
+- **Multi-Tenant Carrier Support**: Organizations now have private, isolated carrier directories with shared naming support.
+- **AI Audit Synchronization**: Fully integrated "Human-in-the-loop" approval for freight matrix findings.
+- **Production Sync Active**: Look for the verification signature in the sidebar to confirm your instance is running the latest core.
+
+---
+
 ## 💼 Business Outcomes
 
 ### Time Savings
