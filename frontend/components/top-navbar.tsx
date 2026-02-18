@@ -7,33 +7,93 @@ import { UserButton } from '@clerk/nextjs'
 import {
     Menu,
     X,
+    Home,
     LayoutDashboard,
     FileText,
     BarChart3,
     Settings,
     Scale,
-    Search
+    Search,
+    ChevronDown,
+    Gavel,
+    TrendingUp,
+    Globe,
+    Sword,
+    ShieldAlert,
+    MapPin,
+    Receipt,
+    Package,
+    LifeBuoy,
+    FileBadge,
+    Zap,
+    Terminal,
+    Trophy,
+    CreditCard
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Input } from '@/components/ui/input'
 import { SearchModal } from '@/components/search-modal'
 import { NotificationsPanel } from '@/components/notifications-panel'
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
-const navigation = [
-    { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-    { name: 'Quotes', href: '/quotes', icon: FileText },
-    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-]
-
-const secondaryNav = [
-    { name: 'Settings', href: '/settings', icon: Settings },
-    { name: 'Legal', href: '/settings/legal', icon: Scale },
+const categories = [
+    {
+        name: 'Procurement',
+        icon: LayoutDashboard,
+        items: [
+            { name: 'Mission Control', href: '/dashboard', icon: LayoutDashboard, desc: 'Real-time activity overview' },
+            { name: 'Tender Management', href: '/procurement/tenders', icon: Gavel, desc: 'Manage bids and awards' },
+            { name: 'Savings Analysis', href: '/quotes', icon: BarChart3, desc: 'Cost optimization insights' },
+        ]
+    },
+    {
+        name: 'Intelligence',
+        icon: TrendingUp,
+        items: [
+            { name: 'Intelligence Hub', href: '/analytics', icon: Zap, desc: 'Strategic analytics overview' },
+            { name: 'Market Intelligence', href: '/analytics/market', icon: Globe, desc: 'Rate trends and benchmarks' },
+            { name: 'Strategic War Room', href: '/analytics/war-room', icon: Sword, desc: 'Simulation and planning' },
+        ]
+    },
+    {
+        name: 'Operations',
+        icon: Zap,
+        items: [
+            { name: 'Global Tracking', href: '/tracking', icon: MapPin, desc: 'Live shipment telematics' },
+            { name: 'Billing & Usage', href: '/settings/billing', icon: CreditCard, desc: 'Credits and subscription' },
+            { name: 'Inventory Sync', href: '/inventory', icon: Package, desc: 'Stock impact prediction' },
+            { name: 'Claims Center', href: '/logistics/claims', icon: LifeBuoy, desc: 'Damage and delay recovery' },
+        ]
+    },
+    {
+        name: 'Compliance',
+        icon: Scale,
+        items: [
+            { name: 'Legal Center', href: '/settings/legal', icon: Scale, desc: 'Regulatory and T&Cs' },
+            { name: 'Trade Compliance', href: '/compliance', icon: FileBadge, desc: 'Customs and HS classification' },
+        ]
+    },
+    {
+        name: 'Resources',
+        icon: Globe,
+        items: [
+            { name: 'Help Center', href: '/docs', icon: LifeBuoy, desc: 'Guides and tutorials' },
+            { name: 'Engineering Blog', href: '/blog', icon: Zap, desc: 'Latest industry insights' },
+            { name: 'Customer Stories', href: '/case-studies', icon: Trophy, desc: 'Measurable ROI success' },
+            { name: 'Developer Portal', href: '/api-reference', icon: Terminal, desc: 'API specs and SDKs' },
+        ]
+    }
 ]
 
 export function TopNavbar() {
     const pathname = usePathname()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const [searchQuery, setSearchQuery] = useState('')
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -43,153 +103,216 @@ export function TopNavbar() {
     return (
         <>
             {/* Main Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
+            <div className="fixed top-0 left-0 right-0 z-[100] bg-red-600 text-white text-[10px] font-black text-center py-1 uppercase tracking-widest">
+                VERIFICATION BANNER V1: IF YOU SEE THIS, YOU ARE ON COMPONENTS/TOP-NAVBAR.TSX
+            </div>
+            <nav className="fixed top-1 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
                 <div className="mx-auto max-w-[1800px] px-4 sm:px-6 lg:px-8">
                     <div className="flex h-16 items-center justify-between">
-                        {/* Left: Logo + Main Navigation */}
+                        {/* Left: Logo + Desktop Categories */}
                         <div className="flex items-center gap-8">
-                            {/* Logo */}
-                            <Link href="/" className="flex items-center gap-2 group">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60 shadow-lg shadow-primary/20 transition-all group-hover:shadow-primary/40">
-                                    <span className="text-lg font-black text-primary-foreground">L</span>
+                            <Link href="/" className="flex items-center gap-2 group mr-4">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-blue-600 shadow-lg shadow-primary/20 transition-all group-hover:shadow-primary/40 group-active:scale-95">
+                                    <Zap size={18} className="text-primary-foreground fill-current" />
                                 </div>
-                                <div className="hidden sm:block">
-                                    <span className="font-heading text-lg font-black tracking-tight text-foreground">LogiMatch</span>
-                                    <span className="ml-1 font-heading text-lg font-black tracking-tight text-primary">AI</span>
+                                <div className="hidden xl:block">
+                                    <span className="font-heading text-lg font-black tracking-tighter text-foreground uppercase italic leading-none">LogiMatch</span>
+                                    <span className="ml-0.5 font-heading text-lg font-black tracking-tighter text-primary uppercase italic leading-none">AI</span>
                                 </div>
                             </Link>
-
-                            {/* Desktop Navigation */}
-                            <div className="hidden md:flex items-center gap-1">
-                                {navigation.map((item) => {
-                                    const isActive = pathname === item.href ||
-                                        (item.href !== '/' && pathname.startsWith(item.href))
-
-                                    return (
-                                        <Link
-                                            key={item.name}
-                                            href={item.href}
-                                            className={cn(
-                                                "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all",
-                                                isActive
-                                                    ? "bg-primary/10 text-primary"
-                                                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                                            )}
-                                        >
-                                            <item.icon size={16} />
-                                            {item.name}
-                                        </Link>
-                                    )
-                                })}
-                            </div>
                         </div>
 
-                        {/* Center: Search Modal */}
-                        <div className="hidden lg:flex flex-1 max-w-md mx-8">
-                            <SearchModal />
-                        </div>
-
-                        {/* Right: Notifications + User Menu */}
-                        <div className="flex items-center gap-3">
-                            {/* Notifications Panel */}
-                            <NotificationsPanel />
-
-                            {/* Settings (Desktop) */}
+                        {/* Right Side: Home, Portal, Resources, Utility Icons */}
+                        <div className="flex items-center gap-1">
+                            {/* Home Link */}
                             <Link
-                                href="/settings"
-                                className="hidden md:flex p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                                href="/"
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black tracking-[0.1em] uppercase transition-all border border-transparent shadow-sm mr-1",
+                                    pathname === '/'
+                                        ? "bg-primary text-primary-foreground shadow-primary/30"
+                                        : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                                )}
                             >
-                                <Settings size={20} />
+                                <Home size={14} className={cn(pathname === '/' ? "fill-white" : "fill-primary")} /> Home
                             </Link>
 
-                            {/* User Button */}
-                            <div className="flex items-center">
-                                {mounted && (
-                                    <UserButton
-                                        afterSignOutUrl="/"
-                                        appearance={{
-                                            elements: {
-                                                avatarBox: "h-8 w-8"
-                                            }
-                                        }}
-                                    />
+                            {/* Portal Link (Primary Navigation) */}
+                            <Link
+                                href="/portal"
+                                className={cn(
+                                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black tracking-[0.1em] uppercase transition-all border border-transparent shadow-sm mr-2",
+                                    pathname === '/portal'
+                                        ? "bg-primary text-primary-foreground shadow-primary/30"
+                                        : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                                 )}
+                            >
+                                <Zap size={14} className={cn(pathname === '/portal' ? "fill-white" : "fill-primary")} /> Portal
+                            </Link>
+
+                            {/* Resources Dropdown */}
+                            <div className="hidden lg:block relative group/res">
+                                <button className={cn(
+                                    "flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium tracking-widest transition-all hover:bg-muted/50 text-muted-foreground hover:text-foreground uppercase",
+                                    pathname.startsWith('/resources') || categories.find(c => c.name === 'Resources')?.items.some(i => pathname === i.href) ? "text-primary bg-primary/5" : ""
+                                )}>
+                                    Resources
+                                    <ChevronDown size={14} className="opacity-40 group-hover/res:rotate-180 transition-transform duration-300" />
+                                </button>
+                                <div className="absolute top-full right-0 pt-2 opacity-0 translate-y-2 pointer-events-none group-hover/res:opacity-100 group-hover/res:translate-y-0 group-hover/res:pointer-events-auto transition-all duration-300 z-50">
+                                    <div className="w-64 bg-background border border-border/50 rounded-2xl shadow-xl p-2 glass-card">
+                                        {categories.find(c => c.name === 'Resources')?.items.map((item) => (
+                                            <Link
+                                                key={item.name}
+                                                href={item.href}
+                                                className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted group/res-item transition-all"
+                                            >
+                                                <div className="p-1.5 rounded-lg bg-muted group-hover/res-item:bg-primary/20 text-muted-foreground group-hover/res-item:text-primary transition-colors">
+                                                    <item.icon size={16} />
+                                                </div>
+                                                <span className="text-sm font-bold tracking-tight text-foreground group-hover/res-item:text-primary transition-colors">{item.name}</span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Mobile Menu Button */}
-                            <button
-                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                                className="md:hidden p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
-                            >
-                                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-                            </button>
+                            <div className="h-4 w-[1px] bg-border/40 mx-2 hidden lg:block" />
+
+                            <div className="flex items-center gap-2">
+                                {mounted && (
+                                    <>
+                                        <SearchModal />
+                                        <NotificationsPanel />
+                                    </>
+                                )}
+
+                                <Link
+                                    href="/settings"
+                                    className="p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all group"
+                                >
+                                    <Settings size={20} className="group-hover:rotate-45 transition-transform" />
+                                </Link>
+
+                                <div className="flex items-center ml-1 border-l border-border/50 pl-3">
+                                    {mounted && (
+                                        <UserButton
+                                            afterSignOutUrl="/"
+                                            appearance={{
+                                                elements: {
+                                                    avatarBox: "h-9 w-9 border-2 border-primary/20 hover:border-primary/50 transition-all rounded-xl shadow-md",
+                                                    userButtonPopoverCard: "rounded-2xl border-border/50 glass-card",
+                                                    userButtonTrigger: "rounded-xl"
+                                                }
+                                            }}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Mobile Menu Button */}
+                                <button
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className="lg:hidden p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all active:scale-90"
+                                >
+                                    {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </nav>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu Panel */}
             {mobileMenuOpen && (
-                <div className="fixed inset-0 z-40 md:hidden">
-                    {/* Backdrop */}
-                    <div
-                        className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-                        onClick={() => setMobileMenuOpen(false)}
-                    />
+                <div className="fixed inset-0 z-40 lg:hidden">
+                    <div className="fixed inset-0 bg-background/90 backdrop-blur-xl animate-in fade-in" onClick={() => setMobileMenuOpen(false)} />
+                    <div className="fixed top-16 left-0 right-0 bottom-0 bg-background border-t border-border overflow-y-auto animate-in slide-in-from-top-1 px-4 py-6">
+                        <div className="space-y-8 pb-20">
+                            <Link
+                                href="/"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={cn(
+                                    "flex items-center gap-4 px-4 py-3 rounded-2xl text-base font-bold transition-all active:scale-95",
+                                    pathname === '/' ? "bg-primary/10 text-primary shadow-sm" : "text-foreground hover:bg-muted/50"
+                                )}
+                            >
+                                <div className={cn("p-2 rounded-xl", pathname === '/' ? "bg-primary/20" : "bg-muted")}>
+                                    <Home size={18} className="text-primary fill-primary" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span>Welcome Home</span>
+                                    <span className="text-[10px] font-medium text-muted-foreground">Return to the landing page</span>
+                                </div>
+                            </Link>
 
-                    {/* Menu Panel */}
-                    <div className="fixed top-16 left-0 right-0 bottom-0 bg-background border-t border-border overflow-y-auto">
-                        <div className="p-4 space-y-2">
-                            {/* Search (Mobile) */}
-                            <div className="relative mb-4">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-                                <Input
-                                    type="text"
-                                    placeholder="Search..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="pl-10"
-                                />
+                            <Link
+                                href="/portal"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className={cn(
+                                    "flex items-center gap-4 px-4 py-3 rounded-2xl text-base font-bold transition-all active:scale-95",
+                                    pathname === '/portal' ? "bg-primary/10 text-primary shadow-sm" : "text-foreground hover:bg-muted/50"
+                                )}
+                            >
+                                <div className={cn("p-2 rounded-xl", pathname === '/portal' ? "bg-primary/20" : "bg-muted")}>
+                                    <Zap size={18} className="text-primary fill-primary" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span>Global Command Center</span>
+                                    <span className="text-[10px] font-medium text-muted-foreground">Access all modules & insights</span>
+                                </div>
+                            </Link>
+
+                            <div className="pt-4 border-t border-border/50">
+                                <h3 className="px-4 text-[10px] font-black uppercase tracking-widest text-primary mb-3">
+                                    Resources
+                                </h3>
+                                <div className="grid grid-cols-1 gap-1">
+                                    {categories.find(c => c.name === 'Resources')?.items.map((item) => (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className={cn(
+                                                "flex items-center gap-4 px-4 py-3 rounded-2xl text-base font-bold transition-all active:scale-95",
+                                                pathname === item.href ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                                            )}
+                                        >
+                                            <div className={cn("p-2 rounded-xl", pathname === item.href ? "bg-primary/20" : "bg-muted")}>
+                                                <item.icon size={18} />
+                                            </div>
+                                            <span>{item.name}</span>
+                                        </Link>
+                                    ))}
+                                </div>
                             </div>
 
-                            {/* Main Navigation */}
-                            {navigation.map((item) => {
-                                const isActive = pathname === item.href ||
-                                    (item.href !== '/' && pathname.startsWith(item.href))
-
-                                return (
+                            <div className="pt-4 border-t border-border/50">
+                                <h3 className="px-4 text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                                    Direct Access
+                                </h3>
+                                <div className="grid grid-cols-1 gap-1">
                                     <Link
-                                        key={item.name}
-                                        href={item.href}
+                                        href="/case-studies"
                                         onClick={() => setMobileMenuOpen(false)}
                                         className={cn(
-                                            "flex items-center gap-3 px-4 py-3 rounded-lg text-base font-semibold transition-all",
-                                            isActive
-                                                ? "bg-primary/10 text-primary"
-                                                : "text-foreground hover:bg-muted/50"
+                                            "flex items-center gap-4 px-4 py-3 rounded-2xl text-base font-bold transition-all active:scale-95",
+                                            pathname === '/case-studies' ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
                                         )}
                                     >
-                                        <item.icon size={20} />
-                                        {item.name}
+                                        Case Studies
                                     </Link>
-                                )
-                            })}
-
-                            {/* Divider */}
-                            <div className="my-4 border-t border-border" />
-
-                            {/* Secondary Navigation */}
-                            {secondaryNav.map((item) => (
-                                <Link
-                                    key={item.name}
-                                    href={item.href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="flex items-center gap-3 px-4 py-3 rounded-lg text-base font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
-                                >
-                                    <item.icon size={20} />
-                                    {item.name}
-                                </Link>
-                            ))}
+                                    <Link
+                                        href="/api-reference"
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className={cn(
+                                            "flex items-center gap-4 px-4 py-3 rounded-2xl text-base font-bold transition-all active:scale-95",
+                                            pathname === '/api-reference' ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted/50"
+                                        )}
+                                    >
+                                        API Reference
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
