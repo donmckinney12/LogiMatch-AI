@@ -1,8 +1,20 @@
+export function getApiUrl() {
+    if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        return "http://localhost:5000";
+    }
+    return process.env.NEXT_PUBLIC_API_URL || "https://logimatch-ai-1.onrender.com";
+}
+
 export async function apiRequest(endpoint: string, options: RequestInit = {}, orgId?: string) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const baseUrl = getApiUrl();
     const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
 
     const headers = new Headers(options.headers || {});
+
+    // Automatically set Content-Type for JSON bodies
+    if (options.body && typeof options.body === 'string' && !headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+    }
 
     // Inject Organization ID if available
     if (orgId) {

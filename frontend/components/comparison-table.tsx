@@ -40,7 +40,7 @@ import { cn } from '@/lib/utils'
 import { EmailModal } from './email-modal'
 import Papa from 'papaparse'
 
-import { apiRequest } from '@/lib/api-client'
+import { apiRequest, getApiUrl } from '@/lib/api-client'
 import { useOrg } from '@/context/org-context'
 
 type Quote = {
