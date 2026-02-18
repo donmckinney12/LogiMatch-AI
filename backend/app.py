@@ -2,32 +2,31 @@ from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
+load_dotenv()
 from services.ocr_service import extract_text_from_pdf
-
-from services.llm_service import extract_data_with_llm, generate_booking_email, generate_exception_email
+from services.llm_service import extract_data_with_llm, generate_booking_email, generate_exception_email, generate_negotiation_email
 from services.coordinator_agent import process_quote_fully
 from services.simulation_service import SimulationService
-from services.pdf_service import generate_booking_pdf
+# from services.pdf_service import generate_booking_pdf
 from services.risk_service import analyze_risk
 from services.email_service import send_email
-import secrets
-from werkzeug.utils import secure_filename
-from models import Carrier, Quote, ExchangeRate, db, AuditLog, UsageMeter, Feedback, Comment, Invoice, Tender, Bid, SKU, InventoryImpact
-from services.analytics_service import get_kpi_dashboard
-from services.negotiation_agent import get_negotiation_response
+from services.analytics_service import get_kpi_dashboard, get_analytics_trends
+# from services.negotiation_agent import get_negotiation_response
 from services.telematics_service import get_shipment_telemetry
 from services.customs_service import classify_hs_code, estimate_duties, generate_customs_docs
-from services.claims_service import analyze_damage_photo, file_claim
-from services.messaging_service import create_thread, send_message, get_threads, get_messages, generate_ai_quick_replies
-from datetime import datetime
-from flask import send_file
+# from services.claims_service import analyze_damage_photo, file_claim
+# from services.messaging_service import create_thread, send_message, get_threads, get_messages, generate_ai_quick_replies
+
+import secrets
+from werkzeug.utils import secure_filename
+from models import Carrier, Quote, ExchangeRate, db, AuditLog, UsageMeter, Feedback, Comment, Invoice, Tender, Bid, SKU, InventoryImpact, SurchargeReference
+
 import stripe
+from datetime import datetime
 
-# Stripe Configuration
-stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://www.logimatch.online')
-
-# ... imports ...
+# Initialize Stripe
+stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 # Helper for Audit Logging
 def log_audit(action, details=None, category="GENERAL", user_id=None):
@@ -39,17 +38,138 @@ def log_audit(action, details=None, category="GENERAL", user_id=None):
     except Exception as e:
         print(f"Failed to log audit: {e}")
 
+def seed_organization_data(org_id):
+    """Clones demo data to a new organization context to prevent empty states."""
+    if not org_id or org_id == 'org_demo_123':
+        return
+    
+    # Check if already seeded by looking for any carriers
+    if Carrier.query.filter_by(organization_id=org_id).first():
+        return
+        
+    print(f"Seeding demo data for new organization: {org_id}")
+    
+    try:
+        # 1. Clone Carriers (appending org_id to name to satisfy unique constraint)
+        demo_carriers = Carrier.query.filter_by(organization_id='org_demo_123').all()
+        carrier_map = {} 
+        for c in demo_carriers:
+            safe_name = f"{c.name} ({org_id[-6:]})"
+            # Ensure we don't duplicate if it somehow exists
+            existing = Carrier.query.filter_by(name=safe_name).first()
+            if existing:
+                carrier_map[c.id] = existing.id
+                continue
+                
+            new_c = Carrier(
+                name=safe_name,
+                reliability_score=c.reliability_score,
+                contact_info=c.contact_info,
+                organization_id=org_id,
+                is_verified=c.is_verified,
+                tax_id=c.tax_id,
+                compliance_score=c.compliance_score,
+                onboarding_status=c.onboarding_status
+            )
+            db.session.add(new_c)
+            db.session.flush() 
+            carrier_map[c.id] = new_c.id
+            
+        # 2. Clone Quotes
+        demo_quotes = Quote.query.filter_by(organization_id='org_demo_123').all()
+        quote_map = {}
+        for q in demo_quotes:
+            new_q = Quote(
+                filename=q.filename,
+                organization_id=org_id,
+                carrier_id=carrier_map.get(q.carrier_id),
+                origin=q.origin,
+                destination=q.destination,
+                currency=q.currency,
+                total_price=q.total_price,
+                normalized_total_price_usd=q.normalized_total_price_usd,
+                surcharges=q.surcharges,
+                risk_flags=q.risk_flags,
+                full_text_content=q.full_text_content,
+                po_number=q.po_number,
+                status=q.status,
+                allocation_date=q.allocation_date,
+                time_to_value_seconds=q.time_to_value_seconds,
+                booking_ref=q.booking_ref,
+                agent_insights=q.agent_insights,
+                is_audited=q.is_audited,
+                audited_by=q.audited_by,
+                carbon_footprint_kg=q.carbon_footprint_kg,
+                transit_time_days=q.transit_time_days,
+                confidence_score=q.confidence_score,
+                estimated_duties=q.estimated_duties,
+                estimated_taxes=q.estimated_taxes,
+                pdf_path=q.pdf_path
+            )
+            db.session.add(new_q)
+            db.session.flush()
+            quote_map[q.id] = new_q.id
+            
+        # 3. Clone Invoices
+        demo_invoices = Invoice.query.filter_by(organization_id='org_demo_123').all()
+        for i in demo_invoices:
+            new_i = Invoice(
+                filename=i.filename,
+                invoice_date=i.invoice_date,
+                organization_id=org_id,
+                invoice_number=i.invoice_number,
+                quote_id=quote_map.get(i.quote_id),
+                total_amount=i.total_amount,
+                normalized_total_amount_usd=i.normalized_total_amount_usd,
+                currency=i.currency,
+                status=i.status,
+                discrepancy_details=i.discrepancy_details
+            )
+            db.session.add(new_i)
+            
+        # 4. Clone Tenders
+        demo_tenders = Tender.query.filter_by(organization_id='org_demo_123').all()
+        for t in demo_tenders:
+            new_t = Tender(
+                title=t.title,
+                description=t.description,
+                organization_id=org_id,
+                created_at=t.created_at,
+                deadline=t.deadline,
+                status=t.status,
+                estimated_volume=t.estimated_volume,
+                lane_info=t.lane_info
+            )
+            db.session.add(new_t)
+            
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error seeding data for {org_id}: {e}")
+
 def get_org_id():
-    """Helper to extract organization_id from headers."""
-    # In a real app, this would come from the verified JWT/Clerk header.
-    return request.headers.get('X-Organization-ID', 'org_demo_123')
+    """Helper to extract organization_id from headers and ensure seeding."""
+    org_id = request.headers.get('X-Organization-ID', 'org_demo_123')
+    if org_id != 'org_demo_123':
+        seed_organization_data(org_id)
+    return org_id
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-# Allow CORS for all domains on all routes
-CORS(app)
+# Allow CORS for development and production origins
+CORS(app, resources={r"/api/*": {
+    "origins": [
+        "http://localhost:3000", 
+        "http://localhost:3001", 
+        "https://logimatch-app.vercel.app",
+        "https://www.logimatch.online"
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization", "X-Organization-ID"],
+    "supports_credentials": True
+}})
 
 # Database Configuration
 db_path = os.path.abspath(os.path.join(os.getcwd(), 'logimatch_v4.db'))
@@ -59,6 +179,11 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     "connect_args": {"check_same_thread": False}
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'uploads')
+
+# Ensure upload folder exists
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
 
 db.init_app(app)
 
@@ -94,16 +219,19 @@ def create_checkout_session():
         price = data.get('price')
         interval = data.get('interval', 'month')
         
-        # Mapping tiers to Stripe Price IDs (Placeholders - user needs to update these)
-        # These should eventually be stored in environment variables or a database
+        # Mapping tiers to Stripe Price IDs from .env
         PRICE_MAP = {
             'BASE': {
-                'month': os.getenv('STRIPE_PRICE_BASE_MONTHLY', 'price_base_placeholder'),
-                'year': os.getenv('STRIPE_PRICE_BASE_YEARLY', 'price_base_year_placeholder')
+                'month': os.getenv('NEXT_PUBLIC_STRIPE_BASE_MONTHLY'),
+                'year': os.getenv('NEXT_PUBLIC_STRIPE_BASE_YEARLY')
             },
             'PRO': {
-                'month': os.getenv('STRIPE_PRICE_PRO_MONTHLY', 'price_pro_placeholder'),
-                'year': os.getenv('STRIPE_PRICE_PRO_YEARLY', 'price_pro_year_placeholder')
+                'month': os.getenv('NEXT_PUBLIC_STRIPE_PRO_MONTHLY'),
+                'year': os.getenv('NEXT_PUBLIC_STRIPE_PRO_YEARLY')
+            },
+            'ENTERPRISE': {
+                'month': os.getenv('NEXT_PUBLIC_STRIPE_ENTERPRISE_MONTHLY'),
+                'year': os.getenv('NEXT_PUBLIC_STRIPE_ENTERPRISE_YEARLY')
             }
         }
 
@@ -112,36 +240,80 @@ def create_checkout_session():
 
         price_id = PRICE_MAP[tier].get(interval)
         
-        if not price_id or 'placeholder' in price_id:
-             # Fallback for demo/missing config: Create a one-time payment or simple price if testing
-             # In a real app, you MUST have these price IDs pre-configured in Stripe
-             print(f"Warning: Using placeholder or missing price ID for {tier} {interval}")
+        if not price_id:
+             return jsonify({"error": f"Price ID not found for {tier} {interval}"}), 400
 
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
+            client_reference_id=data.get('user_id'), # Link to Clerk User ID
             line_items=[{
-                'price_data': {
-                    'currency': 'usd',
-                    'product_data': {
-                        'name': f'LogiMatch AI - {tier} Plan',
-                        'description': f'Unlocking {tier} features for your organization',
-                    },
-                    'unit_amount': int(float(price) * 100), # Amount in cents
-                    'recurring': {
-                        'interval': interval,
-                    },
-                },
+                'price': price_id,
                 'quantity': 1,
             }],
             mode='subscription',
             success_url=f"{FRONTEND_URL}/settings/billing?success=true&session_id={{CHECKOUT_SESSION_ID}}",
             cancel_url=f"{FRONTEND_URL}/settings/billing?canceled=true",
+            metadata={
+                "tier": tier,
+                "interval": interval,
+                "user_id": data.get('user_id'),
+                "organization_id": request.headers.get('X-Organization-ID')
+            }
         )
 
         return jsonify({'url': session.url})
     except Exception as e:
         print(f"Stripe Error: {e}")
         return jsonify({"error": str(e)}), 500
+
+# --- Stripe Webhook Endpoint ---
+@app.route('/api/webhooks/stripe', methods=['POST'])
+def stripe_webhook():
+    payload = request.data
+    sig_header = request.headers.get('STRIPE_SIGNATURE')
+    endpoint_secret = os.getenv('STRIPE_WEBHOOK_SECRET')
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, endpoint_secret
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+    # Handle the event
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        user_id = session.get('client_reference_id')
+        metadata = session.get('metadata', {})
+        tier = metadata.get('tier', 'BASE')
+        
+        try:
+            # Update UsageMeter for the user
+            meter = UsageMeter.query.filter_by(user_id=user_id).first()
+            if not meter:
+                meter = UsageMeter(user_id=user_id)
+                db.session.add(meter)
+            
+            # Use metadata tier for precise updates
+            meter.subscription_tier = tier
+            if tier == 'PRO':
+                meter.usage_limit = 500
+            elif tier == 'ENTERPRISE':
+                meter.usage_limit = 10000
+            else:
+                meter.usage_limit = 50
+            
+            meter.billing_cycle_start = datetime.utcnow()
+            meter.last_processed_at = datetime.utcnow()
+            
+            db.session.commit()
+            log_audit("SUBSCRIPTION_UPGRADED", f"User {user_id} upgraded to {meter.subscription_tier}", "BILLING", user_id)
+            print(f"Successfully upgraded user {user_id} to {meter.subscription_tier}")
+        except Exception as e:
+            print(f"Error updating subscription: {e}")
+            return jsonify({"error": "Failed to update subscription"}), 500
+
+    return jsonify({"status": "success"}), 200
 
 # --- Surcharge Endpoints ---
 @app.route('/api/surcharges', methods=['GET', 'POST'])
@@ -296,9 +468,58 @@ def global_search():
                 "id": "action-create-quote",
                 "type": "ACTION",
                 "title": "Create New Quote",
-                "subtitle": "Upload PDF or enter manually",
+                "subtitle": "Launch the automated bid portal",
                 "icon": "Plus",
-                "action": "/quotes/new"
+                "action": "/procurement/tenders"
+            })
+
+        # 4. Resource Indexing (Docs, Blog, API)
+        if any(k in query for k in ["docs", "help", "guide", "quick"]):
+            results.append({
+                "id": "resource-docs",
+                "type": "ACTION",
+                "title": "Documentation Hub",
+                "subtitle": "Guides, Tutorials, and Technical Resources",
+                "icon": "FileText",
+                "action": "/docs"
+            })
+            results.append({
+                "id": "resource-quick",
+                "type": "ACTION",
+                "title": "Technical Quick Start",
+                "subtitle": "Engineering guide for rapid integration",
+                "icon": "Zap",
+                "action": "/docs/quick-start"
+            })
+
+        if any(k in query for k in ["api", "ref", "dev"]):
+            results.append({
+                "id": "resource-api",
+                "type": "ACTION",
+                "title": "API Reference",
+                "subtitle": "REST endpoints and SDK specifications",
+                "icon": "Code",
+                "action": "/api-reference"
+            })
+
+        if any(k in query for k in ["blog", "news", "insight"]):
+            results.append({
+                "id": "resource-blog",
+                "type": "ACTION",
+                "title": "Engineering Blog",
+                "subtitle": "Latest updates and logistics intelligence",
+                "icon": "BarChart",
+                "action": "/blog"
+            })
+            
+        if any(k in query for k in ["case", "success", "study"]):
+            results.append({
+                "id": "resource-case",
+                "type": "ACTION",
+                "title": "Enterprise Case Studies",
+                "subtitle": "Measurable ROI and success stories",
+                "icon": "FileText",
+                "action": "/case-studies"
             })
             
         return jsonify(results)
@@ -400,6 +621,7 @@ def generate_email():
 
 @app.route('/api/extract', methods=['POST'])
 def extract_pdf():
+    org_id = get_org_id()
     # ... file checks ...
     if 'file' not in request.files:
         return jsonify({"error": "No file part"}), 400
@@ -446,9 +668,9 @@ def extract_pdf():
             # ... Save to DB ...
             carrier_name = extracted_data.get('carrier', 'Unknown')
             # ... carrier creation logic ...
-            carrier = Carrier.query.filter_by(name=carrier_name).first()
+            carrier = Carrier.query.filter_by(name=carrier_name, organization_id=org_id).first()
             if not carrier:
-                carrier = Carrier(name=carrier_name)
+                carrier = Carrier(name=carrier_name, organization_id=org_id)
                 db.session.add(carrier)
                 db.session.commit()
             
@@ -456,6 +678,7 @@ def extract_pdf():
             
             new_quote = Quote(
                 filename=file.filename,
+                organization_id=org_id,
                 user_id=user_id,
                 carrier=carrier,
                 origin=extracted_data.get('origin'),
@@ -769,7 +992,7 @@ def send_email_endpoint():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/admin/analytics', methods=['GET'])
-def get_analytics():
+def get_admin_analytics():
     org_id = get_org_id()
     data = get_kpi_dashboard(organization_id=org_id)
     return jsonify(data)
@@ -950,7 +1173,7 @@ def analyze_risk_impact():
             if lane in at_risk_lanes:
                 impacted_quotes.append({
                     "quote_id": q.id,
-                    "carrier": q.carrier,
+                    "carrier": q.carrier.name if q.carrier else "Unknown",
                     "lane": lane,
                     "status": q.status,
                     "impact_score": 85 if q.status == 'ALLOCATED' else 45,
@@ -1021,12 +1244,13 @@ def get_executive_analytics():
         performance = {}
         for q in quotes:
             if not q.carrier: continue
-            if q.carrier not in performance:
-                performance[q.carrier] = {"prices": [], "transits": []}
+            carrier_name = q.carrier.name
+            if carrier_name not in performance:
+                performance[carrier_name] = {"prices": [], "transits": []}
             if q.normalized_total_price_usd:
-                performance[q.carrier]["prices"].append(q.normalized_total_price_usd)
+                performance[carrier_name]["prices"].append(q.normalized_total_price_usd)
             if q.transit_time_days:
-                performance[q.carrier]["transits"].append(q.transit_time_days)
+                performance[carrier_name]["transits"].append(q.transit_time_days)
         
         matrix = []
         for carrier, data in performance.items():
@@ -1226,19 +1450,28 @@ def approve_audit(quote_id):
     data = request.json
     try:
         org_id = get_org_id()
+        print(f"[AUDIT] Attempting to approve quote {quote_id} for org {org_id}")
+        
         quote = Quote.query.filter_by(id=quote_id, organization_id=org_id).first()
         if not quote:
+            # Robust Fallback Logic for Debugging
+            raw_quote = Quote.query.get(quote_id)
+            if raw_quote:
+                print(f"[AUDIT] FAIL: Quote {quote_id} exists but belongs to org {raw_quote.organization_id} (Requested: {org_id})")
+                return jsonify({"error": f"Quote {quote_id} is associated with a different organization. Please re-upload or check your context."}), 403
+            
+            print(f"[AUDIT] FAIL: Quote {quote_id} does not exist in the database.")
             return jsonify({"error": "Quote not found"}), 404
         
         quote.is_audited = True
         quote.audited_by = data.get('user_id', 'Unknown')
         
-        log_audit("AUDIT_APPROVED", f"Quote ID: {quote_id} by {quote.audited_by}", category="QUOTE")
+        log_audit("AUDIT_APPROVED", f"Quote ID: {quote_id} by {quote.audited_by}", category="QUOTE", user_id=quote.audited_by)
         db.session.commit()
         
         return jsonify({"message": "Audit approved", "quote": quote.to_dict()})
     except Exception as e:
-        print(f"Error approving audit: {e}")
+        print(f"[AUDIT] CRITICAL ERROR: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/reconcile/upload', methods=['POST'])
@@ -1932,6 +2165,63 @@ def post_message(thread_id):
 def suggest_replies(thread_id):
     """Returns AI-suggested quick replies."""
     return jsonify(generate_ai_quick_replies(thread_id))
+
+# --- Analytics & Trend Endpoints ---
+
+@app.route('/api/analytics', methods=['GET'])
+def get_analytics():
+    try:
+        org_id = get_org_id()
+        kpis = get_kpi_dashboard(org_id)
+        return jsonify(kpis)
+    except Exception as e:
+        print(f"Error fetching analytics: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/analytics/trends', methods=['GET'])
+def get_trends():
+    try:
+        org_id = get_org_id()
+        trends = get_analytics_trends(org_id)
+        return jsonify(trends)
+    except Exception as e:
+        print(f"Error fetching trends: {e}")
+        return jsonify({"error": str(e)}), 500
+
+# --- Atlas AI Recommendation Endpoint ---
+
+@app.route('/api/llm/atlas-recommendation', methods=['POST'])
+def get_atlas_advice():
+    try:
+        data = request.json
+        quotes = data.get('quotes', [])
+        
+        if not quotes:
+            return jsonify({"error": "No quotes provided for analysis"}), 400
+            
+        # For now, we'll perform a basic "Best Value" calculation
+        # In a real app, this would call get_atlas_recommendation(quotes) in llm_service
+        
+        # Sort by price primarily, with a secondary check on reliability if available
+        sorted_quotes = sorted(quotes, key=lambda x: (x.get('normalized_total_price_usd', float('inf'))))
+        best_quote = sorted_quotes[0]
+        
+        advice = {
+            "best_option": best_quote.get('carrier', 'Unknown'),
+            "reasoning": f"Atlas recommends {best_quote.get('carrier')} because it offers the most competitive landed cost of ${best_quote.get('normalized_total_price_usd', 0):,.2f}.",
+            "savings_vs_next": 0
+        }
+        
+        if len(sorted_quotes) > 1:
+            next_best = sorted_quotes[1]
+            savings = next_best.get('normalized_total_price_usd', 0) - best_quote.get('normalized_total_price_usd', 0)
+            advice["savings_vs_next"] = savings
+            advice["reasoning"] += f" Choosing this option saves you ${savings:,.2f} compared to the next best alternative."
+
+        return jsonify(advice)
+    except Exception as e:
+        print(f"Atlas Recommendation Error: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

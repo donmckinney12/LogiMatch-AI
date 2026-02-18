@@ -5,8 +5,9 @@ import json
 db = SQLAlchemy()
 
 class Carrier(db.Model):
+    __table_args__ = (db.UniqueConstraint('name', 'organization_id', name='_name_org_uc'),)
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
+    name = db.Column(db.String(100), nullable=False)
     reliability_score = db.Column(db.Float, default=100.0)
     contact_info = db.Column(db.String(255), nullable=True)
     organization_id = db.Column(db.String(50), nullable=True, default="org_demo_123")

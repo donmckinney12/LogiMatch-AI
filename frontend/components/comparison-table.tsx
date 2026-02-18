@@ -40,6 +40,9 @@ import { cn } from '@/lib/utils'
 import { EmailModal } from './email-modal'
 import Papa from 'papaparse'
 
+import { apiRequest, getApiUrl } from '@/lib/api-client'
+import { useOrg } from '@/context/org-context'
+
 type Quote = {
     id: string
     carrier: string
@@ -65,6 +68,7 @@ type Quote = {
 const columnHelper = createColumnHelper<Quote>()
 
 export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[], normalizationEnabled: boolean }) {
+    const { orgId } = useOrg()
     const [sorting, setSorting] = useState<SortingState>([])
     const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null)
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false)
@@ -120,15 +124,13 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
     const handleException = async () => {
         if (!selectedQuote) return
         try {
-            const res = await fetch(`http://localhost:5000/api/shipments/exception`, {
+            const data = await apiRequest(`/api/shipments/exception`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     po_number: selectedQuote.po_number,
                     reason: exceptionReason
                 })
             })
-            const data = await res.json()
             setIsExceptionOpen(false)
             setAiDraft(data)
         } catch (e) {
@@ -140,11 +142,10 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
     const handleAllocate = async () => {
         if (!selectedQuote || !poNumber) return
         try {
-            await fetch(`http://localhost:5000/api/quotes/${selectedQuote.id}/allocate`, {
+            await apiRequest(`/api/quotes/${selectedQuote.id}/allocate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ po_number: poNumber })
-            })
+            }, orgId)
             window.location.reload()
         } catch (e) {
             console.error("Allocation failed", e)
@@ -155,11 +156,10 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
     const handleApproveAudit = async () => {
         if (!selectedQuote) return
         try {
-            await fetch(`http://localhost:5000/api/quotes/${selectedQuote.id}/approve-audit`, {
+            await apiRequest(`/api/quotes/${selectedQuote.id}/approve-audit`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user_id: 'PilotUser_01' })
-            })
+            }, orgId)
             setIsAuditOpen(false)
             window.location.reload()
         } catch (e) {
@@ -172,15 +172,13 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
         if (!selectedQuote) return
         try {
             const challenges = selectedQuote.agent_insights?.filter(i => i.status !== 'OK') || []
-            const res = await fetch(`http://localhost:5000/api/negotiation/challenge`, {
+            const draft = await apiRequest(`/api/negotiation/challenge`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     quote: selectedQuote,
                     challenges
                 })
-            })
-            const draft = await res.json()
+            }, orgId)
             setIsAuditOpen(false)
             setAiDraft({
                 ...draft,
@@ -212,12 +210,10 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
     const handleSimulate = async () => {
         if (!selectedQuote || !hsCode) return
         try {
-            const res = await fetch(`http://localhost:5000/api/quotes/${selectedQuote.id}/simulate`, {
+            const data = await apiRequest(`/api/quotes/${selectedQuote.id}/simulate`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ hs_code: hsCode })
-            })
-            const data = await res.json()
+            }, orgId)
             setSimulationResult(data.simulation)
         } catch (e) {
             console.error("Simulation failed", e)
@@ -232,20 +228,14 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
         }
 
         try {
-            const res = await fetch(`http://localhost:5000/api/erp/sync`, {
+            const result = await apiRequest(`/api/erp/sync`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ quote_id: quote.id })
-            })
-            const result = await res.json()
-            if (res.ok) {
-                alert(`ERP Sync Success!\nRef: ${result.erp_reference}\nSystem: ${result.details}`)
-            } else {
-                alert("ERP Sync Error: " + result.error)
-            }
-        } catch (e) {
+            }, orgId)
+            alert(`ERP Sync Success!\nRef: ${result.erp_reference}\nSystem: ${result.details}`)
+        } catch (e: any) {
             console.error("ERP sync failed", e)
-            alert("Network error during ERP sync")
+            alert("ERP Sync Error: " + (e.message || "Unknown error"))
         }
     }
 
@@ -259,8 +249,8 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
                 Destination: q.destination,
                 'Original Price': `${q.total_price} ${q.currency}`,
                 'Normalized Price (USD)': q.normalized_total_price_usd ? `$${q.normalized_total_price_usd.toFixed(2)}` : 'N/A',
-                'Surcharge Count': q.surcharges.length,
-                'Flags': q.surcharges.filter(s => !s.normalized_name).length,
+                'Surcharge Count': q.surcharges?.length || 0,
+                'Flags': q.surcharges?.filter(s => !s.normalized_name).length || 0,
                 'Risk Flags': q.risk_flags?.join(', ') || ''
             }))
 
@@ -269,7 +259,7 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
             const link = document.createElement('a')
             const url = URL.createObjectURL(blob)
             link.setAttribute('href', url)
-            link.setAttribute('download', 'freight_quotes_comparison.csv')
+            link.setAttribute('download', 'Ocean_Freight_Rate_Sheet.csv')
             link.style.visibility = 'hidden'
             document.body.appendChild(link)
             link.click()
@@ -690,25 +680,19 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
                         <button
                             onClick={async () => {
                                 try {
-                                    const res = await fetch('http://localhost:5000/api/email/send', {
+                                    await apiRequest('/api/email/send', {
                                         method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({
                                             to: 'warehouse@logistics-demo.com',
                                             subject: aiDraft.draft_subject,
                                             body: aiDraft.draft_body
                                         })
                                     })
-                                    if (res.ok) {
-                                        alert("Email Sent via SendGrid!")
-                                        setAiDraft(null)
-                                    } else {
-                                        const err = await res.json()
-                                        alert("Failed to send: " + (err.error || "Unknown error"))
-                                    }
-                                } catch (e) {
+                                    alert("Email Sent via SendGrid!")
+                                    setAiDraft(null)
+                                } catch (e: any) {
                                     console.error(e)
-                                    alert("Network error sending email")
+                                    alert("Failed to send: " + (e.message || "Unknown error"))
                                 }
                             }}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700"
@@ -888,8 +872,8 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
                                 Original PDF
                             </div>
                             <iframe
-                                src={`http://localhost:5000/api/uploads/${(selectedQuote as any)?.pdf_path}`}
-                                className="w-full h-full"
+                                src={`${getApiUrl()}/api/uploads/${(selectedQuote as any)?.pdf_path}`}
+                                className="w-full h-full border-none rounded-2xl"
                                 title="PDF Preview"
                             />
                         </div>
@@ -984,7 +968,7 @@ export function ComparisonTable({ data, normalizationEnabled }: { data: Quote[],
                             <input
                                 value={mfaCode}
                                 onChange={(e) => setMfaCode(e.target.value)}
-                                className="w-full text-center text-2xl tracking-[0.5em] font-mono p-3 border rounded-lg bg-neutral-50"
+                                className="w-full text-center text-2xl tracking-[0.5em] font-mono p-3 border rounded-lg bg-neutral-50 text-neutral-900"
                                 placeholder="000000"
                                 maxLength={6}
                             />
