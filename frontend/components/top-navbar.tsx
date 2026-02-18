@@ -1,9 +1,10 @@
 "use client"
+// v5.0_DEPLOY_SIG_771
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { UserButton } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import {
     Menu,
     X,
@@ -95,10 +96,14 @@ export function TopNavbar() {
     const pathname = usePathname()
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [mounted, setMounted] = useState(false)
+    const { isLoaded, isSignedIn } = useUser()
 
     useEffect(() => {
         setMounted(true)
     }, [])
+
+    // Auth Guard: Prevent rendering if auth is not ready
+    if (!mounted || !isLoaded) return null
 
     return (
         <>

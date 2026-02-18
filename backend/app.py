@@ -28,7 +28,21 @@ from datetime import datetime
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
-# Helper for Audit Logging
+# Enable CORS for all routes
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "http://localhost:3000",
+            "https://logimatch-app.vercel.app",
+            "https://www.logimatch.online",
+            "https://logimatch.online",
+            "https://logimatch-ai-1.onrender.com"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Organization-ID"],
+        "supports_credentials": True
+    }
+})
 def log_audit(action, details=None, category="GENERAL", user_id=None):
     try:
         org_id = get_org_id()
